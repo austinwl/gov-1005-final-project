@@ -21,3 +21,7 @@ constructed confidence intervals for each community (a community is defined very
 the quad or the river; it can also refer to a single house like Currier or Leverett). The distribution of personal 
 identifiers (financial aid, legacy status, varsity status, etc.) from the official housing data was then compared to our
 confidence intervals. Our results show that mostly all distributions fell within the confidence intervals.
+
+Create a random process without the existing blocking groups. 
+
+How is self-segregation affected by population size.

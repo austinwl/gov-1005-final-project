@@ -1,0 +1,204 @@
+---
+title: "chi_squared"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(broom)
+library(gt)
+```
+
+
+```{r load_data}
+
+random_longer <- readRDS("shiny_app/simplified.RDS") 
+
+
+# I didn't want to change the name of the object read into the ShinyApp
+# so I just redid the calculation here
+
+real <- official_housing %>% 
+  
+  # 1) take the sheet of freshman and nest
+  nest(data=everything()) %>% 
+  
+  # 2) take each tibble of "assigned" freshmen and generate community summaries
+  
+  # neighborhoods
+  mutate(river_central = map(data, ~overview(assigned = ., community = 'river_central'))) %>% 
+  mutate(river_east = map(data, ~overview(assigned = ., community = 'river_east'))) %>% 
+  mutate(river_west = map(data, ~overview(assigned = ., community = 'river_west'))) %>% 
+  mutate(river = map(data, ~overview(assigned = ., community = 'river'))) %>% 
+  mutate(quad = map(data, ~overview(assigned = ., community = 'quad'))) %>% 
+  
+  #river_central
+  mutate(adams = map(data, ~overview(assigned = ., community = 'Adams'))) %>% 
+  mutate(lowell = map(data, ~overview(assigned = ., community = 'Lowell'))) %>% 
+  mutate(quincy = map(data, ~overview(assigned = ., community = 'Quincy'))) %>% 
+  
+  
+  # river_east
+  mutate(leverett = map(data, ~overview(assigned = ., community = 'Leverett'))) %>% 
+  mutate(dunster = map(data, ~overview(assigned = ., community = 'Dunster'))) %>% 
+  mutate(mather = map(data, ~overview(assigned = ., community = 'Mather'))) %>%  
+  
+  
+  # river_west
+  mutate(winthrop = map(data, ~overview(assigned = ., community = 'Winthrop'))) %>% 
+  mutate(kirkland = map(data, ~overview(assigned = ., community = 'Kirkland'))) %>% 
+  mutate(eliot = map(data, ~overview(assigned = ., community = 'Eliot'))) %>%   
+  
+  
+  # quad
+  mutate(currier = map(data, ~overview(assigned = ., community = 'Currier'))) %>% 
+  mutate(pforzheimer = map(data, ~overview(assigned = ., community = 'Pforzheimer'))) %>% 
+  mutate(cabot = map(data, ~overview(assigned = ., community = 'Cabot'))) 
+
+```
+
+
+```{r}
+
+random_longer$community[which(random_longer$community == "pfoho")] <- "pforzheimer"
+
+cleaned_random <- random_longer %>%
+  ungroup(replicate) %>% 
+  select(-replicate) %>% 
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+aggregated <- aggregate(. ~ community, cleaned_random, mean)
+
+
+```
+
+```{r}
+real_pivoted <- real %>% 
+  pivot_longer(-data, 
+               names_to = "community", 
+               values_to = "demographics") %>% 
+  select(-data)
+
+
+official <- real_pivoted %>%
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+official
+```
+
+```{r}
+
+# two datasets to compare: aggregated and official
+
+
+aggregated
+official
+
+comparison <- left_join(aggregated, official, by = "community", suffix = c(".aggregated", ".official")) 
+
+# changes to frequencies to compare with chi squared
+
+comparison[2:11] <- round(comparison[2:11]*1637, 0)
+
+```
+
+
+
+```{r}
+
+# create house and neighborhood subsets
+
+comparison_houses <- comparison %>% 
+  filter(community %in% c("adams", "cabot", "currier",
+                          "dunster", "eliot", "kirkland",
+                          "leverett", "lowell", "mather",
+                          "pforzheimer", "quincy", "winthrop"))
+
+comparison_neighborhoods <- comparison %>% 
+  filter(community %in% c("quad", "river_east", "river_central", "river_west"))
+
+comparison_houses
+comparison_neighborhoods
+
+```
+
+
+```{r}
+
+# compare houses 
+tibble(
+  variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
+  pvalue = c(
+    # prop_international
+    chisq.test(comparison_houses$prop_international.aggregated, comparison_houses$prop_international.official)%>% tidy() %>% pull(p.value),
+    
+    # prop_varsity
+    chisq.test(comparison_houses$prop_varsity.aggregated, comparison_houses$prop_varsity.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_legacy
+    chisq.test(comparison_houses$prop_legacy.aggregated, comparison_houses$prop_legacy.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_financial_aid
+    chisq.test(comparison_houses$prop_financial_aid.aggregated, comparison_houses$prop_financial_aid.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_group_size
+    chisq.test(comparison_houses$prop_group_size.aggregated, comparison_houses$prop_group_size.official) %>% tidy() %>% pull(p.value)
+  )
+) %>% 
+  gt() %>% 
+  tab_header(
+    title = "Chi-squared test ",
+    subtitle = "Comparison between the twelve Harvard houses"
+  ) %>% 
+  cols_label(
+    variable = "Variable",
+    pvalue = "P-Value"
+  )
+```
+
+```{r}
+# compare neighborhoods 
+
+tibble(
+  variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
+  pvalue = c(
+    # prop_international
+    chisq.test(comparison_neighborhoods$prop_international.aggregated, comparison_neighborhoods$prop_international.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_varsity
+    chisq.test(comparison_neighborhoods$prop_varsity.aggregated, comparison_neighborhoods$prop_varsity.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_legacy
+    chisq.test(comparison_neighborhoods$prop_legacy.aggregated, comparison_neighborhoods$prop_legacy.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_financial_aid
+    chisq.test(comparison_neighborhoods$prop_financial_aid.aggregated, comparison_neighborhoods$prop_financial_aid.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_group_size
+    chisq.test(comparison_neighborhoods$prop_group_size.aggregated, comparison_neighborhoods$prop_group_size.official) %>% tidy() %>% pull(p.value)
+  )
+) %>% 
+  gt() %>% 
+  tab_header(
+    title = "Chi-squared test ",
+    subtitle = "Comparison between the four Harvard neighborhoods"
+  ) %>% 
+  cols_label(
+    variable = "Variable",
+    pvalue = "P-Value"
+  )
+
+    
+```
+
+# Results and Concerns:
+Is the Chi-squared test appropriate?
+- The sampling method is simple random sampling (Not true? Collected 600 responses over email; also variables are related to one another (financial aid can be related to ethnicity))
+- The variables under study are each categorical (Observations report counts for each categorical variable)
+- If sample data are displayed in a contingency table, the expected frequency count for each cell of the table is at least 5 (Yes; enough data)
+
+Interpretation of Chi-squared:
+- The p-values are all very high (> 0.20) --> we accept the null hypothesis (we can't reject the null hypothesis) that the data are similar.
+
