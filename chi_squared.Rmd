@@ -12,6 +12,8 @@ library(gt)
 
 ```{r load_data}
 
+# reads in the high rep data from shiny
+
 random_longer <- readRDS("shiny_app/simplified.RDS") 
 
 
@@ -58,9 +60,14 @@ real <- official_housing %>%
 ```
 
 
-```{r}
+```{r random_pivot}
+
+# modifies pfohos name to match in the join
 
 random_longer$community[which(random_longer$community == "pfoho")] <- "pforzheimer"
+
+# pivots the high rep data so that it can be aggregated more easily and ungroups
+# replicate
 
 cleaned_random <- random_longer %>%
   ungroup(replicate) %>% 
@@ -73,7 +80,10 @@ aggregated <- aggregate(. ~ community, cleaned_random, mean)
 
 ```
 
-```{r}
+```{r real_pivot}
+
+# does the same pivot and selection process for the real data
+
 real_pivoted <- real %>% 
   pivot_longer(-data, 
                names_to = "community", 
@@ -88,17 +98,19 @@ official <- real_pivoted %>%
 official
 ```
 
-```{r}
+```{r join_data}
 
-# two datasets to compare: aggregated and official
-
+# two datasets to compare: aggregated (randomized) and official 
 
 aggregated
 official
 
+# joins the aggregated (randomized) and official data to put variables side
+# by side for comparison
+
 comparison <- left_join(aggregated, official, by = "community", suffix = c(".aggregated", ".official")) 
 
-# changes to frequencies to compare with chi squared
+# changes proportions to frequencies to compare with chi squared
 
 comparison[2:11] <- round(comparison[2:11]*1637, 0)
 
@@ -106,9 +118,9 @@ comparison[2:11] <- round(comparison[2:11]*1637, 0)
 
 
 
-```{r}
+```{r split_house_and_neighborhood}
 
-# create house and neighborhood subsets
+# create house and neighborhood subsets for comparison
 
 comparison_houses <- comparison %>% 
   filter(community %in% c("adams", "cabot", "currier",
@@ -125,7 +137,7 @@ comparison_neighborhoods
 ```
 
 
-```{r}
+```{r chisq_tests_houses}
 
 # compare houses 
 tibble(
@@ -158,7 +170,7 @@ tibble(
   )
 ```
 
-```{r}
+```{r chisq_tests_neighborhoods}
 # compare neighborhoods 
 
 tibble(
@@ -195,10 +207,14 @@ tibble(
 
 # Results and Concerns:
 Is the Chi-squared test appropriate?
+- Consider doing it manually without the square. Absolute value difference. What number of houses are more than 4% off (epsilon-delta?)
 - The sampling method is simple random sampling (Not true? Collected 600 responses over email; also variables are related to one another (financial aid can be related to ethnicity))
 - The variables under study are each categorical (Observations report counts for each categorical variable)
 - If sample data are displayed in a contingency table, the expected frequency count for each cell of the table is at least 5 (Yes; enough data)
 
 Interpretation of Chi-squared:
 - The p-values are all very high (> 0.20) --> we accept the null hypothesis (we can't reject the null hypothesis) that the data are similar.
+
+
+modify aggregate to multiply by house size not class
 
