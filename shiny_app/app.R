@@ -367,6 +367,10 @@ All Sensitive questions have a “prefer not to answer” option.")
                             p("My name is Sam (Sam'aan) Saba, and I am a rising Palestiniain-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
                      ),
                      column(4,
+                            imageOutput("Eliot"),
+                            p("Hello! My name is Eliot and I’m a member of the class of 2023 here at Harvard. I hope to use my newly learned data analyzing skills to investigate speculative claims and unsubstantiated theories, as we did with Harvard College’s housing day. Outside of data science, I’m an a cappella junkie, diehard New York Mets fan, and sushi addict.")
+                     ),
+                     column(4,
                             imageOutput("Shojeh"),
                             p("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")
                      )
@@ -1115,6 +1119,12 @@ This likely causes the discrepancy seen here.")
   }, deleteFile = FALSE)
   
   output$Ilyas <- renderImage({list(src = './www/Ilyas.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Eliot <- renderImage({list(src = './www/Eliot.JPG',
                                     width = 300,
                                     height = 400)
     
