@@ -176,7 +176,8 @@ chisq_houses <- readRDS("chisq_houses.RDS")
 chisq_neighborhoods <- readRDS("chisq_neighborhoods.RDS")
   
 
-ui <- navbarPage(theme = shinytheme("simplex"),
+ui <- navbarPage(fluid = T,
+                 theme = shinytheme("simplex"),
                  "Blocking Project",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
@@ -292,20 +293,86 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                           ),
                 
                 
-                 tabPanel("About", 
-                          titlePanel("About"),
-                          h3("Project Background and Motivations"),
-                          p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
+                 tabPanel("About",
+                   fluidRow(
+                     column(6,
+                            h1("About")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            h3("Project Background and Motivations")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
                This project aims to continue the work of the previous blocking group project with more rigorous data analytics and statistical computation, more intuitive graph design, and additional questions (including sexual orientation). It will hopefully build on the previous analysis attempting to find any discrepancies.
               
 
 The project will attempt to replicate a truly random housing lottery to assess if Harvard’s housing appears to be random as well. The project will check variables such as legacy, race, religion, athletics, sex, freshman dorm, financial aid, international students, and blocking group size.
 
-All Sensitive questions have a “prefer not to answer” option."),
-                          h3("About Us"),
-                          p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
+All Sensitive questions have a “prefer not to answer” option.")
+                     )
+                   ),
+                   fluidRow(
+                     column(3,
+                            h3("About Us")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
              Jamal Nimer, Carina Peng, Ilyas Mardin, Shojeh Liu, Eliot Min, Lucy He, Angie Shin, Austin Li, and Sam Saba.
-               ")))
+               ")
+                     )
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Jamal")),
+                     column(4,
+                            imageOutput("Angie")),
+                     column(4,
+                            imageOutput("Austin"))
+                   ),
+                   fluidRow(
+                     column(4,
+                            p("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games.")
+                     ),
+                     column(4,
+                            p("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")
+                     ),
+                     column(4,
+                            p("My name is Austin Li, and I am planning on studying Physics/Math with a secondary in Computer Science. I’m interested in Asian American civic engagement and outside of class, I enjoy writing for The Crimson, playing volleyball, and playing board games! Feel free to contact me at awli@college.harvard.edu")
+                     )                     
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Carina"),
+                            "Hello! I’m Carina, a rising sophomore from the best city Chicago and living in the best house Dunster. I was lucky to be working with a great team to investigate Harvard’s housing lottery system, and I hope to use data science in the future on issues of international development and public health. I love traveling and snacking on roasted coconut chips"
+                     ),
+                     column(4,
+                            imageOutput("Ilyas"),
+                            p("Hi I’m Ilyas, a member of the class of 2023! I hope to use my interest in data science to more effectively implement medicines and antibiotics in the future. Some of my favourite things are Lauv, tennis, and exploring new places to eat! Feel free to get in touch with me at ilyasmardin@college.harvard.edu.")
+                     ),
+                     column(4,
+                            imageOutput("Lucy"),
+                            p("Hi! I’m Lucy He, a current freshman at Harvard College thinking about concentrating in computer science & math. Besides data science, I’m also a big fan of musical theater, urban planning, and more ;) You can reach me at luxihe@college.harvard.edu")
+                     )
+
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Sam"),
+                            p("My name is Sam (Sam'aan) Saba, and I am a rising Palestiniain-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
+                     ),
+                     column(4,
+                            imageOutput("Shojeh"),
+                            p("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")
+                     )
+                   
+
+                          )))
 
 
 server <- function(input, output) {
@@ -915,7 +982,7 @@ This likely causes the discrepancy seen here.")
     
     suitemate_size_relationship %>%
       ggplot(aes(x = size, y = perc_blockwithsuite))+geom_point() +
-      geom_smooth(method = "lm", se = F) + 
+      geom_smooth(method = "lm", se = F, color = "#00BFC4") + 
       labs(x = "Size of Freshman Dorm",
            y = "Percentage of blocking groups containing 2+ suitemates from dorm",
            title = "Size of Freshman Dorm against Rooming with Suitemates") +
@@ -939,7 +1006,7 @@ This likely causes the discrepancy seen here.")
     
     ggplot(links_n_sizes, aes(x = is_linking, y = group_size)) + 
       geom_jitter() + 
-      geom_smooth(method = "lm", se = FALSE) +
+      geom_smooth(method = "lm", se = FALSE, color = "#00BFC4") +
       scale_y_continuous(limits = c(0, 8)) +
       scale_x_continuous(limits = c(0, 1), breaks = c(0.2,0.8), labels = c("not linked", "linked")) + 
       labs(x = "Presence of a Linking Group",
@@ -1005,7 +1072,53 @@ This likely causes the discrepancy seen here.")
     chisq_neighborhoods
   })
   
+  output$Jamal <- renderImage({list(src = './www/Jamal.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
   
+  output$Austin <- renderImage({list(src = './www/Austin.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Carina <- renderImage({list(src = './www/Carina.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Shojeh <- renderImage({list(src = './www/Shojeh.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Lucy <- renderImage({list(src = './www/Lucy.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Sam <- renderImage({list(src = './www/Sam.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Angie <- renderImage({list(src = './www/Angie.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Ilyas <- renderImage({list(src = './www/Ilyas.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
 }
 #   
 # animate(plot, renderer = ffmpeg_renderer())
