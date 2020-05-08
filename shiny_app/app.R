@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(cowplot)
 library(gifski)
 library(png)
+library(gt)
 
 # READING IN DATA FILES
 
@@ -175,11 +176,16 @@ chisq_houses <- readRDS("chisq_houses.RDS")
 chisq_neighborhoods <- readRDS("chisq_neighborhoods.RDS")
   
 
-ui <- navbarPage(theme = shinytheme("simplex"),
+ui <- navbarPage(fluid = T,
+                 theme = shinytheme("simplex"),
                  "Blocking Project",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
-                          "Side-by-side comparison of our data's demographics vs The Crimson emographics",
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with, we can be more assured that our data is representative. All in all, our data shows very similar demographics percentages compared to the Crimson. For Gender, International student, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian and White was combined with Middle Eastern/North African, we saw that our numbers only differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is rather easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not specify our definition of legacy."),
+                          
+                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for international student, ethnicity, financial aid, gender, legacy student, and varsity athete composition of the class of 2023."),
+                          
+                          p("Side-by-side comparison of our data's demographics vs The Crimson emographics"),
                           selectInput("type",
                                       label = "Select a distribution to compare:",
                                       choices = c("International Students" = "International",
@@ -188,8 +194,7 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                   "Financial Aid Students" = "Financial Aid",
                                                   "Ethnicity Distributions" = "Ethnicity",
                                                   "Gender Distributions" = "Gender")
-                          ),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. Click the dropdown menu to see how our data stacks up against the Crimson's composition of the class of 2023."),
+                          ),                          
                           mainPanel(
                             plotOutput("ValGraphs", width = "140%")
                           )),
@@ -288,20 +293,86 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                           ),
                 
                 
-                 tabPanel("About", 
-                          titlePanel("About"),
-                          h3("Project Background and Motivations"),
-                          p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
+                 tabPanel("About",
+                   fluidRow(
+                     column(6,
+                            h1("About")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            h3("Project Background and Motivations")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
                This project aims to continue the work of the previous blocking group project with more rigorous data analytics and statistical computation, more intuitive graph design, and additional questions (including sexual orientation). It will hopefully build on the previous analysis attempting to find any discrepancies.
               
 
 The project will attempt to replicate a truly random housing lottery to assess if Harvard’s housing appears to be random as well. The project will check variables such as legacy, race, religion, athletics, sex, freshman dorm, financial aid, international students, and blocking group size.
 
-All Sensitive questions have a “prefer not to answer” option."),
-                          h3("About Us"),
-                          p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
+All Sensitive questions have a “prefer not to answer” option.")
+                     )
+                   ),
+                   fluidRow(
+                     column(3,
+                            h3("About Us")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
              Jamal Nimer, Carina Peng, Ilyas Mardin, Shojeh Liu, Eliot Min, Lucy He, Angie Shin, Austin Li, and Sam Saba.
-               ")))
+               ")
+                     )
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Jamal")),
+                     column(4,
+                            imageOutput("Angie")),
+                     column(4,
+                            imageOutput("Austin"))
+                   ),
+                   fluidRow(
+                     column(4,
+                            p("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games.")
+                     ),
+                     column(4,
+                            p("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")
+                     ),
+                     column(4,
+                            p("My name is Austin Li, and I am planning on studying Physics/Math with a secondary in Computer Science. I’m interested in Asian American civic engagement and outside of class, I enjoy writing for The Crimson, playing volleyball, and playing board games! Feel free to contact me at awli@college.harvard.edu")
+                     )                     
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Carina"),
+                            "Hello! I’m Carina, a rising sophomore from the best city Chicago and living in the best house Dunster. I was lucky to be working with a great team to investigate Harvard’s housing lottery system, and I hope to use data science in the future on issues of international development and public health. I love traveling and snacking on roasted coconut chips"
+                     ),
+                     column(4,
+                            imageOutput("Ilyas"),
+                            p("Hi I’m Ilyas, a member of the class of 2023! I hope to use my interest in data science to more effectively implement medicines and antibiotics in the future. Some of my favourite things are Lauv, tennis, and exploring new places to eat! Feel free to get in touch with me at ilyasmardin@college.harvard.edu.")
+                     ),
+                     column(4,
+                            imageOutput("Lucy"),
+                            p("Hi! I’m Lucy He, a current freshman at Harvard College thinking about concentrating in computer science & math. Besides data science, I’m also a big fan of musical theater, urban planning, and more ;) You can reach me at luxihe@college.harvard.edu")
+                     )
+
+                   ),
+                   fluidRow(
+                     column(4,
+                            imageOutput("Sam"),
+                            p("My name is Sam (Sam'aan) Saba, and I am a rising Palestiniain-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
+                     ),
+                     column(4,
+                            imageOutput("Shojeh"),
+                            p("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")
+                     )
+                   
+
+                          )))
 
 
 server <- function(input, output) {
@@ -321,12 +392,16 @@ server <- function(input, output) {
       our_graph <- create_pie(our_international, "Our Data")
       crim_graph <- create_pie(crim_international, "Crimson Data")
     } else if (type == 2) {
-      our_graph <- create_pie(our_athlete, "Our Data")
+      our_graph <- create_pie(our_athlete, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_athletes, "Crimson Data") +
         labs(caption = "Crimson Athlete data only includes recruited student athletes.* 
 This likely causes the discrepancy seen here.")     
     } else if (type == 3) {
-      our_graph <- create_pie(our_legacy, "Our Data")
+      our_graph <- create_pie(our_legacy, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_legacy, "CrimsonData") +
         labs(caption = "Crimson Legacy data includes all relatives, including siblings.* 
 This likely causes the discrepancy seen here.")
@@ -352,7 +427,7 @@ This likely causes the discrepancy seen here.")
       input$variable == "prop_international" ~ c(.05, .25),
       input$variable == "prop_varsity" ~ c(.10, .25),
       input$variable == "prop_legacy" ~ c(.1, .25),
-      input$variable == "prop_financial_aid" ~ c(.5, .8),
+      input$variable == "prop_financial_aid" ~ c(.4, .8),
       input$variable == "prop_group_size" ~ c(5, 7)
     )
     
@@ -810,7 +885,7 @@ This likely causes the discrepancy seen here.")
     asians <- ggplot(ethnicities %>% filter(prop_asian > 0) %>% count(prop_asian), aes(x = prop_asian, y = n/46)) +
       geom_col(width = .05) +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of Asian students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing Asian students",
@@ -823,7 +898,7 @@ This likely causes the discrepancy seen here.")
     whites <- ggplot(ethnicities%>%filter(prop_white > 0) %>% count(prop_white), aes(x = prop_white, y = n/57)) +
       geom_col(width = .05) +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of White students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing White students",
@@ -875,7 +950,7 @@ This likely causes the discrepancy seen here.")
     heterosexuals <- ggplot(orientations %>% filter(prop_heterosexual > 0) %>% count(prop_heterosexual), aes(x=prop_heterosexual, y = n/70)) + 
       geom_col(width = .05) + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of heterosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing heterosexual students",
@@ -888,7 +963,7 @@ This likely causes the discrepancy seen here.")
     homosexuals <- ggplot(orientations %>% filter(prop_homosexual > 0) %>% count(prop_homosexual), aes(x=prop_homosexual, y = n/20)) + 
       geom_col(width = .05) + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of homosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing homosexual students",
@@ -907,7 +982,7 @@ This likely causes the discrepancy seen here.")
     
     suitemate_size_relationship %>%
       ggplot(aes(x = size, y = perc_blockwithsuite))+geom_point() +
-      geom_smooth(method = "lm", se = F) + 
+      geom_smooth(method = "lm", se = F, color = "#00BFC4") + 
       labs(x = "Size of Freshman Dorm",
            y = "Percentage of blocking groups containing 2+ suitemates from dorm",
            title = "Size of Freshman Dorm against Rooming with Suitemates") +
@@ -931,9 +1006,9 @@ This likely causes the discrepancy seen here.")
     
     ggplot(links_n_sizes, aes(x = is_linking, y = group_size)) + 
       geom_jitter() + 
-      geom_smooth(method = "lm", se = FALSE) +
+      geom_smooth(method = "lm", se = FALSE, color = "#00BFC4") +
       scale_y_continuous(limits = c(0, 8)) +
-      scale_x_continuous(limits = c(0, 1), breaks = c(0,1), labels = c("not linked", "linked")) + 
+      scale_x_continuous(limits = c(0, 1), breaks = c(0.2,0.8), labels = c("not linked", "linked")) + 
       labs(x = "Presence of a Linking Group",
            y = "Blocking Group Size",
            title = "Blocking Group Size vs Presence of a Linking Group") +
@@ -997,7 +1072,53 @@ This likely causes the discrepancy seen here.")
     chisq_neighborhoods
   })
   
+  output$Jamal <- renderImage({list(src = './www/Jamal.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
   
+  output$Austin <- renderImage({list(src = './www/Austin.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Carina <- renderImage({list(src = './www/Carina.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Shojeh <- renderImage({list(src = './www/Shojeh.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Lucy <- renderImage({list(src = './www/Lucy.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Sam <- renderImage({list(src = './www/Sam.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Angie <- renderImage({list(src = './www/Angie.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Ilyas <- renderImage({list(src = './www/Ilyas.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
 }
 #   
 # animate(plot, renderer = ffmpeg_renderer())
