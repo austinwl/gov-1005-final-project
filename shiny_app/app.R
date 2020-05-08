@@ -818,7 +818,7 @@ This likely causes the discrepancy seen here.")
     asians <- ggplot(ethnicities %>% filter(prop_asian > 0) %>% count(prop_asian), aes(x = prop_asian, y = n/46)) +
       geom_col(width = .05) +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of Asian students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing Asian students",
@@ -831,7 +831,7 @@ This likely causes the discrepancy seen here.")
     whites <- ggplot(ethnicities%>%filter(prop_white > 0) %>% count(prop_white), aes(x = prop_white, y = n/57)) +
       geom_col(width = .05) +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of White students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing White students",
@@ -883,7 +883,7 @@ This likely causes the discrepancy seen here.")
     heterosexuals <- ggplot(orientations %>% filter(prop_heterosexual > 0) %>% count(prop_heterosexual), aes(x=prop_heterosexual, y = n/70)) + 
       geom_col(width = .05) + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of heterosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing heterosexual students",
@@ -896,7 +896,7 @@ This likely causes the discrepancy seen here.")
     homosexuals <- ggplot(orientations %>% filter(prop_homosexual > 0) %>% count(prop_homosexual), aes(x=prop_homosexual, y = n/20)) + 
       geom_col(width = .05) + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of homosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing homosexual students",
@@ -941,7 +941,7 @@ This likely causes the discrepancy seen here.")
       geom_jitter() + 
       geom_smooth(method = "lm", se = FALSE) +
       scale_y_continuous(limits = c(0, 8)) +
-      scale_x_continuous(limits = c(0, 1), breaks = c(0,1), labels = c("not linked", "linked")) + 
+      scale_x_continuous(limits = c(0, 1), breaks = c(0.2,0.8), labels = c("not linked", "linked")) + 
       labs(x = "Presence of a Linking Group",
            y = "Blocking Group Size",
            title = "Blocking Group Size vs Presence of a Linking Group") +
