@@ -134,10 +134,13 @@ create_pie <- function(data, title) {
     ggplot(aes(x = 2, y = Percentage, fill = Type)) +
     geom_bar(stat="identity", color = "white") +
     coord_polar(theta = "y", start = 0)+
-    geom_text(aes( y = lab.ypos, label = paste(Percentage, "%")), color = "Black")+
+    geom_text(aes( y = lab.ypos, label = paste(Percentage, "%")), color = "Black", family = "Avenir")+
     theme_void()+
     labs(title = title,
          fill = NULL) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(text = element_text(family = "Avenir")) +
+    theme(title = element_text(family = "Avenir")) + 
     xlim(.5, 2.5)
 }
 
@@ -166,10 +169,16 @@ ethnicity <- function(community) {
 }
 
 
+# for chi_sq tests
+
+chisq_houses <- readRDS("chisq_houses.RDS") 
+chisq_neighborhoods <- readRDS("chisq_neighborhoods.RDS")
+  
 
 ui <- navbarPage(theme = shinytheme("simplex"),
                  "Blocking Project",
                  tabPanel("Data Validation",
+                          titlePanel("Data Validation"),
                           "Side-by-side comparison of our data's demographics vs The Crimson emographics",
                           selectInput("type",
                                       label = "Select a distribution to compare:",
@@ -180,7 +189,7 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                   "Ethnicity Distributions" = "Ethnicity",
                                                   "Gender Distributions" = "Gender")
                           ),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. Click the dropdown menu to see how our data stacks up against the Crimson's for international student, ethnicity, financial aid, gender, legacy student, and varsity athete composition of the class of 2023."),
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. Click the dropdown menu to see how our data stacks up against the Crimson's composition of the class of 2023."),
                           mainPanel(
                             plotOutput("ValGraphs", width = "140%")
                           )),
@@ -234,7 +243,8 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                          navlistPanel(
                            tabPanel("Self-Segregation",
                          titlePanel("Self-Segregation by Race"),
-                         p("We wanted to investigate whether students self-segregated during the blocking process. Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
+                         p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions"),
+                         p("Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
                          plotOutput("segregationGraphs", width = "110%") %>%
                   withSpinner(color="#0dc5c1"),
                   titlePanel("Self-Segregation by Sexual Orientation"),
@@ -245,7 +255,10 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                   p("
                     Finally, we also investigated gender distribution across blocking groups and found segregation occured in that realm also. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
                   plotOutput("genderGraphs", width = "110%") %>%
-                    withSpinner(color="#0dc5c1")),
+                    withSpinner(color="#0dc5c1"),
+                  br(),
+                  br()
+                  ),
                   tabPanel("Correlations",
                              titlePanel("Blocking with your Suitemates"),
                                       p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a negative correlation between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
@@ -263,12 +276,18 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                            titlePanel("Varsity Athletes per Blocking Group"),
                            p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
                   plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")))),
+                
                  tabPanel("Discussion",
                           titlePanel("Conclusions from Data Collection and Analysis"),
                           p("A huge wrench was thrown into our data collection with the coronavirus evacuation. We are currently working on acquiring data in spite of this disruption.
                We inputted model data into the survey we made to get preliminary graphs. More detailed work will follow with actual data collection and analysis."),
                           titlePanel("Potential Discrepancies in Data Collection/Collection Process"),
-                          p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible.")),
+                          p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible."),
+                          gt_output("chisq_houses"),
+                          gt_output("chisq_neighborhoods")
+                          ),
+                
+                
                  tabPanel("About", 
                           titlePanel("About"),
                           h3("Project Background and Motivations"),
@@ -394,7 +413,10 @@ This likely causes the discrepancy seen here.")
       x = xlabel,
       y = "Replicates",
       subtitle = "Red bars represent confidence intervals") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable != "prop_group_size"){
       graph1 <- graph1 + scale_x_continuous(limits = xscale, labels = scales::percent)
@@ -422,7 +444,10 @@ This likely causes the discrepancy seen here.")
       x = xlabel,
       y = "Replicates",
       subtitle = "Red bars represent confidence intervals") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable != "prop_group_size"){
       graph2 <- graph2 + scale_x_continuous(limits = xscale, labels = scales::percent)
@@ -481,7 +506,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = pfoho_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_pfoho, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     currier_conf.int <- confidence_interval_pivoted("currier") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -501,7 +529,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = currier_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_currier, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     cabot_conf.int <- confidence_interval_pivoted("cabot") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -521,7 +552,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = cabot_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_cabot, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     mather_conf.int <- confidence_interval_pivoted("mather") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -541,7 +575,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = mather_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_mather, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     leverett_conf.int <- confidence_interval_pivoted("leverett") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -561,7 +598,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = leverett_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_leverett, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
       
     dunster_conf.int <- confidence_interval_pivoted("dunster") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -581,7 +621,10 @@ This likely causes the discrepancy seen here.")
      geom_vline(xintercept = dunster_conf.int[2], color = "#F8766D") +
      geom_vline(xintercept = pull_desired(base_dunster, input$variable2), 
                 color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+     theme(plot.title = element_text(hjust = 0.5)) +
+     theme(text = element_text(family = "Avenir")) +
+     theme(title = element_text(family = "Avenir")) 
     
     eliot_conf.int <- confidence_interval_pivoted("eliot") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -601,7 +644,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = eliot_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_eliot, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     kirkland_conf.int <- confidence_interval_pivoted("kirkland") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -621,7 +667,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = kirkland_conf.int[2], color = "#F8766D") + 
       geom_vline(xintercept = pull_desired(base_kirkland, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
 
     winthrop_conf.int <- confidence_interval_pivoted("winthrop") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -641,7 +690,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = winthrop_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_winthrop, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
 
     adams_conf.int <- confidence_interval_pivoted("adams") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -661,7 +713,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = adams_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_adams, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     lowell_conf.int <- confidence_interval_pivoted("lowell") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -681,7 +736,10 @@ This likely causes the discrepancy seen here.")
       labs(x = xlabel, 
            y = ylabel,
            title = "Lowell") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     
     quincy_conf.int <- confidence_interval_pivoted("quincy") %>%
@@ -703,7 +761,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = quincy_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_quincy, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable2 != "prop_group_size"){
       
@@ -744,7 +805,6 @@ This likely causes the discrepancy seen here.")
     
   })
   
-  
   output$segregationGraphs <- renderPlot({
     
     asians <- ggplot(ethnicities %>% filter(prop_asian > 0) %>% count(prop_asian), aes(x = prop_asian, y = n/46)) +
@@ -755,7 +815,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing Asian students",
            subtitle = "46 blocking groups contained at least one Asian student") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     whites <- ggplot(ethnicities%>%filter(prop_white > 0) %>% count(prop_white), aes(x = prop_white, y = n/57)) +
       geom_col(width = .05) +
@@ -765,7 +828,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing White students",
            subtitle = "57 blocking groups contained at least one White student") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(asians, whites)
     
@@ -782,7 +848,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing female students",
            subtitle = "55 blocking groups contained at least one female student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     males <- ggplot(gender %>% filter(prop_male > 0) %>% count(prop_male), aes(x=prop_male, y = n/49)) + 
       geom_col(width = .05) + 
@@ -792,7 +861,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing male students",
            subtitle = "49 blocking groups contained at least one male student") +
-      theme_classic() 
+      theme_classic()  + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(females, males)
                     
@@ -808,7 +880,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing heterosexual students",
            subtitle = "70 blocking groups contained at least one heterosexual student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     homosexuals <- ggplot(orientations %>% filter(prop_homosexual > 0) %>% count(prop_homosexual), aes(x=prop_homosexual, y = n/20)) + 
       geom_col(width = .05) + 
@@ -818,7 +893,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing homosexual students",
            subtitle = "20 blocking groups contained at least one homosexual student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(homosexuals, heterosexuals)
     
@@ -834,7 +912,10 @@ This likely causes the discrepancy seen here.")
            y = "Percentage of blocking groups containing 2+ suitemates from dorm",
            title = "Size of Freshman Dorm against Rooming with Suitemates") +
       scale_y_continuous(labels = scales::percent) +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
   })
   
   output$linkVsGroupSize <- renderPlot({
@@ -856,7 +937,10 @@ This likely causes the discrepancy seen here.")
       labs(x = "Presence of a Linking Group",
            y = "Blocking Group Size",
            title = "Blocking Group Size vs Presence of a Linking Group") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     
   })
@@ -882,7 +966,10 @@ This likely causes the discrepancy seen here.")
       labs(title = "House Placements by Freshman Dorm",
            x = "Freshman Dorm", 
            y = "Percentage of Students") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
   })
 
@@ -894,7 +981,19 @@ This likely causes the discrepancy seen here.")
       labs(x = "House Placement",
            y = "Average Varsity athletes per blocking group",
            title = "Varsity Athletes per Blocking Group") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
+  })
+  
+  output$chisq_houses <- render_gt({
+    chisq_houses 
+    
+  })
+  
+  output$chisq_neighborhoods <- render_gt({
+    chisq_neighborhoods
   })
   
   

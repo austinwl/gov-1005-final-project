@@ -171,7 +171,8 @@ comparison_neighborhoods
 ```{r chisq_tests_houses}
 
 # compare houses 
-tibble(
+
+chisq_houses <- tibble(
   variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
   pvalue = c(
     # prop_international
@@ -198,13 +199,16 @@ tibble(
   cols_label(
     variable = "Variable",
     pvalue = "P-Value"
-  )
+  ) 
+
+chisq_houses
 ```
+
 
 ```{r chisq_tests_neighborhoods}
 # compare neighborhoods 
 
-tibble(
+chisq_neighborhoods <- tibble(
   variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
   pvalue = c(
     # prop_international
@@ -233,8 +237,18 @@ tibble(
     pvalue = "P-Value"
   )
 
+
+chisq_neighborhoods
     
 ```
+
+
+```{r}
+saveRDS(object = chisq_houses, file = "shiny_app/chisq_houses.RDS")
+saveRDS(object = chisq_neighborhoods, file = "shiny_app/chisq_neighborhoods.RDS")
+```
+
+
 
 # Results and Concerns:
 Is the Chi-squared test appropriate?

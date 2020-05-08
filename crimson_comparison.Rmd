@@ -77,7 +77,7 @@ crim_international <- data.frame(
 )
 
 crim_legacy <- data.frame(
-  Type = c("No Legacy", "Legacy*"),
+  Type = c("Not Legacy", "Legacy*"),
   Percentage = c(73.1, 26.9)
 )
 
@@ -125,7 +125,7 @@ our_international <- data.frame(
 )
 
 our_legacy <- data.frame(
-  Type = c("Legacy", "No Legacy"),
+  Type = c("Legacy", "Not Legacy"),
   Percentage = c(round(mean(official_housing$legacy, na.rm = TRUE)*100, digits = 1), 100-round(mean(official_housing$legacy, na.rm = TRUE)*100, digits = 1))
 )
 
