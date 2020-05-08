@@ -269,8 +269,8 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                            plotOutput("linkVsGroupSize")%>%
                              withSpinner(color="#0dc5c1")),
                   tabPanel("Miscellaneous",
-                           titlePanel("Freshman Dorm -> House Placement"),
-                           p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the miniscule population size (14 members). Massachusetts was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
+                           titlePanel("Freshman Dorm"),
+                           p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the small population size (14 members). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
                            plotOutput("whereDoTheyGo") %>%
                              withSpinner(color="#0dc5c1"),
                            titlePanel("Varsity Athletes per Blocking Group"),
@@ -959,14 +959,15 @@ This likely causes the discrepancy seen here.")
              pctriver = ifelse(quad == "River", pct, 0))
       
     
-    ggplot(combined, aes(x = fct_reorder(dorm, (pctriver)), y = pct, color = quad)) + 
+    ggplot(combined, aes(x = fct_reorder(dorm, (pctriver)), y = pct, fill = quad)) + 
     geom_bar(stat = "identity") +
       scale_y_continuous(labels = scales::percent) +
       coord_flip() +
       labs(title = "House Placements by Freshman Dorm",
            x = "Freshman Dorm", 
-           y = "Percentage of Students") +
-      theme_classic() + 
+           y = "Percentage of Students",
+           fill = "Neighborhood") +
+      theme_classic() +  
       theme(plot.title = element_text(hjust = 0.5)) +
       theme(text = element_text(family = "Avenir")) +
       theme(title = element_text(family = "Avenir")) 
