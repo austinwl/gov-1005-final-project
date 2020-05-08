@@ -243,7 +243,7 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                          navlistPanel(
                            tabPanel("Self-Segregation",
                          titlePanel("Self-Segregation by Race"),
-                         p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions"),
+                         p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions."),
                          p("Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
                          plotOutput("segregationGraphs", width = "110%") %>%
                   withSpinner(color="#0dc5c1"),
