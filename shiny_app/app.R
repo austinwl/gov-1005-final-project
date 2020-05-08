@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(cowplot)
 library(gifski)
 library(png)
+library(gt)
 
 # READING IN DATA FILES
 
@@ -179,7 +180,11 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                  "Blocking Project",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
-                          "Side-by-side comparison of our data's demographics vs The Crimson emographics",
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with, we can be more assured that our data is representative. All in all, our data shows very similar demographics percentages compared to the Crimson. For Gender, International student, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian and White was combined with Middle Eastern/North African, we saw that our numbers only differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is rather easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not specify our definition of legacy."),
+                          
+                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for international student, ethnicity, financial aid, gender, legacy student, and varsity athete composition of the class of 2023."),
+                          
+                          p("Side-by-side comparison of our data's demographics vs The Crimson emographics"),
                           selectInput("type",
                                       label = "Select a distribution to compare:",
                                       choices = c("International Students" = "International",
@@ -188,8 +193,7 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                   "Financial Aid Students" = "Financial Aid",
                                                   "Ethnicity Distributions" = "Ethnicity",
                                                   "Gender Distributions" = "Gender")
-                          ),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. Click the dropdown menu to see how our data stacks up against the Crimson's composition of the class of 2023."),
+                          ),                          
                           mainPanel(
                             plotOutput("ValGraphs", width = "140%")
                           )),
@@ -321,12 +325,16 @@ server <- function(input, output) {
       our_graph <- create_pie(our_international, "Our Data")
       crim_graph <- create_pie(crim_international, "Crimson Data")
     } else if (type == 2) {
-      our_graph <- create_pie(our_athlete, "Our Data")
+      our_graph <- create_pie(our_athlete, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_athletes, "Crimson Data") +
         labs(caption = "Crimson Athlete data only includes recruited student athletes.* 
 This likely causes the discrepancy seen here.")     
     } else if (type == 3) {
-      our_graph <- create_pie(our_legacy, "Our Data")
+      our_graph <- create_pie(our_legacy, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_legacy, "CrimsonData") +
         labs(caption = "Crimson Legacy data includes all relatives, including siblings.* 
 This likely causes the discrepancy seen here.")
@@ -352,7 +360,7 @@ This likely causes the discrepancy seen here.")
       input$variable == "prop_international" ~ c(.05, .25),
       input$variable == "prop_varsity" ~ c(.10, .25),
       input$variable == "prop_legacy" ~ c(.1, .25),
-      input$variable == "prop_financial_aid" ~ c(.5, .8),
+      input$variable == "prop_financial_aid" ~ c(.4, .8),
       input$variable == "prop_group_size" ~ c(5, 7)
     )
     
