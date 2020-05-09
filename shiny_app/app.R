@@ -181,9 +181,9 @@ ui <- navbarPage(fluid = T,
                  "Blocking Project",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with, we can be more assured that our data is representative. All in all, our data shows very similar demographics percentages compared to the Crimson. For Gender, International student, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian and White was combined with Middle Eastern/North African, we saw that our numbers only differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is rather easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not specify our definition of legacy."),
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with the Crimson's results, we can be more confident that our data is representative of the class. All in all, our data shows very similar demographic distributions. For Gender, International students, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian, and White was combined with Middle Eastern/North African, we saw that our numbers  differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not provide a definition for legacy."),
                           
-                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for international student, ethnicity, financial aid, gender, legacy student, and varsity athete composition of the class of 2023."),
+                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for international students, ethnicity, financial aid, gender, legacy students, and varsity athlete composition of the class of 2023."),
                           
                           p("Side-by-side comparison of our data's demographics vs The Crimson emographics"),
                           selectInput("type",
@@ -227,7 +227,9 @@ ui <- navbarPage(fluid = T,
                                      mainPanel(
                                        p("Pick two neighborhoods (we added the River as a section for your convenience) and a variable to view a side-by-side comparison! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
                                        plotOutput("graphsTogether", width = "150%") %>%
-                                         withSpinner(color="#0dc5c1")
+                                         withSpinner(color="#0dc5c1"),
+                                       br(),
+                                       br()
                                      )),
                             tabPanel("Comparisons Across Houses",
                                      selectInput("variable2",
@@ -241,7 +243,9 @@ ui <- navbarPage(fluid = T,
                                      p("Select a variable to see its distributions across all 12 upperclassmen houses! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
                                      mainPanel(
                                        plotOutput("allHouses", width = "160%", height = "500px") %>%
-                                         withSpinner(color="#0dc5c1")
+                                         withSpinner(color="#0dc5c1"),
+                                       br(),
+                                       br()
                                      ))
                             )),
                 tabPanel("Other Trends",
@@ -266,7 +270,7 @@ ui <- navbarPage(fluid = T,
                   ),
                   tabPanel("Correlations",
                              titlePanel("Blocking with your Suitemates"),
-                                      p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a negative correlation between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
+                                      p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
                                      plotOutput("suitemateSizeRelationship") %>% 
                                        withSpinner(color="#0dc5c1"),
                            titlePanel("Blocking Group Size and Linking"),
@@ -280,12 +284,13 @@ ui <- navbarPage(fluid = T,
                              withSpinner(color="#0dc5c1"),
                            titlePanel("Varsity Athletes per Blocking Group"),
                            p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
-                  plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")))),
+                  plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1"),
+                  br(),
+                  br()))),
                 
                  tabPanel("Discussion",
-                          titlePanel("Conclusions from Data Collection and Analysis"),
-                          p("A huge wrench was thrown into our data collection with the coronavirus evacuation. We are currently working on acquiring data in spite of this disruption.
-               We inputted model data into the survey we made to get preliminary graphs. More detailed work will follow with actual data collection and analysis."),
+                          titlePanel("Data Collection"),
+                          p("To collect our data, we sent out an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates). We collected 583 (35.6% of the 1637 first-years) responses from the survey. Respondents provided us with the names of their blocking group names, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
                           titlePanel("Potential Discrepancies in Data Collection/Collection Process"),
                           p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible."),
                           gt_output("chisq_houses"),
