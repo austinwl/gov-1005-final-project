@@ -283,7 +283,7 @@ ui <- navbarPage(fluid = T,
                                     plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")),
                            tabPanel("House Approval Rate",
                                     titlePanel("House Approval Rate"),
-                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best."),
+                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best. As expected those quaded were far less likely to think their house is the best house compared to their river counterparts (Cabot: 61.5%, Pfoho: 60.0%, Currier: 36.8%). Those placed in Currier were the least happy with the outcome of their housing day. On the other hand, 100% of those placed in Lowell reported that their house was the best house. Future projects that follow the Class of 2023's satisfaction with their housing assignment could provide a longitudinal analysis of satisfaction over time."),
                                     plotOutput("approvalRate") %>% withSpinner(color="#0dc5c1"))
                            )),
                 
@@ -300,25 +300,34 @@ ui <- navbarPage(fluid = T,
                           h4("Confidence Intervals"),
                           p("As can be seen on the \"Comparisons\" tab, there are very few variables that fall outside of the 95% confidence intervals we generated. The following exceptions were noted:"),
                           tags$ol(
-                            tags$li("International Students low in Cabot: 2.6%"),
-                            tags$li("Financial Aid low in Eliot: 44.6%"),
-                            tags$li("Group Size large in Adams: 6.86"),
-                            tags$li("Group Size large in Mather: 6.92"),
-                            tags$li("Financial Aid low in River West: 51.4%")
+                            tags$li("International Students in Cabot: 2.6% of students in Cabot are international which is below the lower bound of the 95% confidence interval (2.94%)."),
+                            tags$li("Financial Aid in Eliot: 44.6% of students in Eliot are on financial aid which is below the the lower bound of the 95% confidence interval (47.2%)."),
+                            tags$li("Group Size in Adams: The average blocking group size in Adams is 6.86 students which is above the upper bound of the 95% confidence interval (6.78 students)"),
+                            tags$li("Group Size in Mather: The average blocking group size in Mather is 6.92 students which is above the upper bound of the 95% confidence interval (6.89 students)"),
+                            tags$li("Financial Aid in River West: 51.4% of students in River West are on financial aid which is below the lower bound of the 95% confidence interval (52.3%). This is largely due to the low proportion of students on financial aid in Eliot, but both other River West houses (Kirkland and Winthrop) have financial aid proportions below the median value generated in our random simulation (Kirkland has 56.4% of students on financial aid which is below the median value of 61.0% and Winthrop has 55.6% of students on financial aid which is below the median value of 61.5%).")
                           ),
                           h4("Chi-squared Test"),
-                          p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible."),
-                          gt_output("chisq_houses"),
-                          gt_output("chisq_neighborhoods")
+                          p("Besides generating confidence intervals and comparing the results to the raw data, we also conducted a chi-squared test for the houses and the neighborhoods. The chi-squared test checks for a goodness-of-fit to determine if there is a statistically significant difference between two distributions of categorical variables. The two distributions passed into the chi-squared test were 1. the median values for five summary statistics (international students, varsity students, legacy students, financial aid, blocking group size) produced by our random simulation, and 2. the official values for these variables based on the college's official housing process. A p-value below 0.05 suggests that there is a statistically significant difference between the two distributions. Therefore for our purposes, if the p-value is below 0.05, then there is a statistically significant difference between our random simulation and the official housing process. If the p-value is above 0.05, there is no statistically-significant difference between the two distributions and we cannot reject the null hypothesis. In other words, if p < 0.05, there is evidence of bias in the housing process, but if p > 0.05, then there is not enough evidence to say the process isn't random."),
+                          br(),
+                          fluidRow(
+                            column(3, offset = 2, gt_output("chisq_houses")),
+                            column(3, offset = 2, gt_output("chisq_neighborhoods"))
+                          ),
+                          br(),
+                          p("Each of the five variables have p-values far above 0.05 for analysis on the house and neighborhood level. This suggests that there is not evidence to reject the null hypothesis and we cannot conclude that Harvard's housing is not random. This is consistent with previous findings on Harvard's housing process. Paired with the very few observations that fall outside of our confidence intervals, it appears that Harvard continues to run a relatively random process."),
+                          
+                          titlePanel("Areas of Improvement"),
+                          h4("Data Collection"),
+                          p("We were able to collect data for 72.1% of the class but nearly a third of the data was left out of our study. Due to campus evacuation, we were unable to collect data in person at the College. An opportunity to publicize the survey in first-year common spaces would have increased the available information for our analysis."),
+                          h4("Randomization"),
+                          p("Every randomization process has its own biases. A good randomization process minimizes these biases. For our randomization process, there were a number of tradeoffs we made. The most important tradeoff was between uniform variable distributions versus adjusted distributions based on house size. If we assigned the same number of students to each house, we would have been more likely to get a uniform distribution for the variables in each house. We did not believe this simulated the actual limitations of the housing process and so we sacrificed a more uniform distribution for what we believe more accurately represents the housing process."),
+                          h4("Fairness"),
+                          p("We chose to use confidence intervals and a chi-squared test to determine whether or not Harvard's housing process is \"fair.\" A different definition or methodology could have easily produced a different conclusion. While we considered using a numeric approach to determine \"fairness\" (a sum of residuals between the observed variable distribution and the expected variable distribution from the random simulation), we decided against this strategy because unlike the chi-squared test, there was no objective measure for what benchmark would indicate an unfair housing process."),
+                          br()
                           ),
                 
                 
                  tabPanel("About",
-                   fluidRow(
-                     column(6,
-                            h1("About")
-                     )
-                   ),
                    fluidRow(
                      column(12,
                             h3("Project Background and Motivations")
