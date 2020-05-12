@@ -385,7 +385,7 @@ ui <- navbarPage(fluid = T,
                    br(),
                    fluidRow(
                      column(3, imageOutput("Angie")),
-                     column(4, offset = 1, h1("Angie"), br(), h3("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")),
+                     column(4, offset = 1, h1("Angie Shin"), br(), h3("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")),
                    ),
                    br(),
                    br()

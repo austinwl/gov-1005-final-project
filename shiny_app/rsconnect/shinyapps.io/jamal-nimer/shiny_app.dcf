@@ -5,8 +5,8 @@ account: jamal-nimer
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2054250
-bundleId: 3135738
+bundleId: 3135787
 url: https://jamal-nimer.shinyapps.io/shiny_app/
-when: 1589270317.75942
+when: 1589270826.22757
 asMultiple: FALSE
 asStatic: FALSE
