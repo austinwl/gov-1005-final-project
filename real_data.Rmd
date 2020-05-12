@@ -110,22 +110,10 @@ quad <- all_communities %>%
   unnest(quad)
 ```
 
-```{r house_approval}
-
-# determines approval rates for students' assigned houses
-
-house_approval <- official_housing %>% 
-  group_by(house) %>% 
-  select(house, approval) %>% 
-  summarize(mean = mean(approval, na.rm = TRUE)) %>% 
-  arrange(desc(mean))
-
-```
 
 ```{r saveRDS}
 # saveRDS(object = assigned_all, file = "shiny_app/updated_fake_data.RDS")
 
- saveRDS(object = house_approval, file = "shiny_app/house_approval.RDS")
 ```
 
 

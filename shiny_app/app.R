@@ -251,48 +251,52 @@ ui <- navbarPage(fluid = T,
                 tabPanel("Other Trends",
                          navlistPanel(
                            tabPanel("Self-Segregation",
-                         titlePanel("Self-Segregation by Race"),
-                         p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions."),
-                         p("Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
-                         plotOutput("segregationGraphs", width = "110%") %>%
-                  withSpinner(color="#0dc5c1"),
-                  titlePanel("Self-Segregation by Sexual Orientation"),
-                  p("We were also curious about self-segregation among students of different sexual orientations. There was a striking divide between blocking groups that contained homosexual students and those that contained heterosexual students. The majority of groups containing at least one heterosexual member were comprised entirely of heterosexual students, while the majority of blocking groups with at least one homosexual member were less than 50% composed of homosexual members."),
-                  plotOutput("sexualOrientationGraphs", width = "110%") %>%
-                    withSpinner(color="#0dc5c1"),
-                  titlePanel("Self-Segregation by Gender"),
-                  p("
-                    Finally, we also investigated gender distribution across blocking groups and found segregation occured in that realm also. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
-                  plotOutput("genderGraphs", width = "110%") %>%
-                    withSpinner(color="#0dc5c1"),
-                  br(),
-                  br()
-                  ),
-                  tabPanel("Correlations",
-                             titlePanel("Blocking with your Suitemates"),
-                                      p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
-                                     plotOutput("suitemateSizeRelationship") %>% 
-                                       withSpinner(color="#0dc5c1")),
-                  tabPanel("Miscellaneous",
-                           titlePanel("Freshman Dorm"),
-                           p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the small population size (14 members). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
-                           plotOutput("whereDoTheyGo") %>%
-                             withSpinner(color="#0dc5c1"),
-                           titlePanel("Varsity Athletes per Blocking Group"),
-                           p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
-                  plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1"),
-                  br(),
-                  br()))),
+                                    titlePanel("Self-Segregation by Race"),
+                                    p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions."),
+                                    p("Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
+                                    plotOutput("segregationGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    titlePanel("Self-Segregation by Sexual Orientation"),
+                                    p("We were also curious about self-segregation among students of different sexual orientations. There was a striking divide between blocking groups that contained homosexual students and those that contained heterosexual students. The majority of groups containing at least one heterosexual member were comprised entirely of heterosexual students, while the majority of blocking groups with at least one homosexual member were less than 50% composed of homosexual members."),
+                                    plotOutput("sexualOrientationGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    titlePanel("Self-Segregation by Gender"),
+                                    p("Finally, we also investigated gender distribution across blocking groups and found segregation occured in that realm also. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
+                                    plotOutput("genderGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    br(),
+                                    br()
+                           ),
+                           tabPanel("Suitemates & Dorm Size",
+                                    titlePanel("Blocking with your Suitemates"),
+                                    p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
+                                    plotOutput("suitemateSizeRelationship") %>% 
+                                      withSpinner(color="#0dc5c1")),
+                           tabPanel("Freshman Dorm",
+                                    titlePanel("Freshman Dorm"),
+                                    p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the small population size (14 members). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
+                                    plotOutput("whereDoTheyGo") %>%
+                                      withSpinner(color="#0dc5c1")),
+                           tabPanel("Varsity Athletes",
+                                    titlePanel("Varsity Athletes per Blocking Group"),
+                                    p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
+                                    plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")),
+                           tabPanel("House Approval Rate",
+                                    titlePanel("House Approval Rate"),
+                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best."),
+                                    plotOutput("approvalRate") %>% withSpinner(color="#0dc5c1"))
+                           )),
+                
                 
                  tabPanel("Discussion",
                           titlePanel("Data Collection"),
                           p("To collect our data, we sent an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates)."),
-                          p("We collected 583 (35.6% of the 1637 first-years) responses from the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
+                          p("We collected 583 (35.6% of the 1637 first-years) responses through the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
                           p("We made sure there was no double counting in the list of 1180 students (there was potential for overlap between the 583 students that filled out the survey and the names of the blocking group members we pulled from each person's response). To do so, we matched every respondent and blocking group member to their result in the Harvard College Facebook. We then took out any duplicates once spelling was standardized. Due to the sensitive information collected in this survey like financial aid status and sexual orientation, we decided not to make the data publicly available."),
                           titlePanel("Randomization Process"),
                           p("To simulate the housing process, we [1] identified blocking groups, [2] selected blocking groups at random and assigned them to a house until the house was full (we referenced official house sizes to determine how many students to assign to the house), [3] repeated step 2 for each house. Once we completed the assignment process, we generated summary statistics for the house using the 9 individual variables and the group size. We repeated this process 500 times and created confidence intervals for each variable using the summary statistics for each house. We also generated summary statistics and confidence intervals for each neighborhood (the \"River\" as a whole was added as a single neighborhood - even though it technically consists of three neighborhoods: River West, River Central, and River East - to compare the River to the Quad more conveniently)."),
                           titlePanel("Goodness of Fit"),
-                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated summary statistics for each house and neighborhood with the same methodology used for the random housing process (we used the official housing assignments and collected the same summary statistics). To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used a chi-squared test and confidence intervals."),
+                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated the same summary statistics for each house and neighborhood for both the random simulation and the official data. To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used a chi-squared test and confidence intervals."),
                           h4("Confidence Intervals"),
                           p("As can be seen on the \"Comparisons\" tab, there are very few variables that fall outside of the 95% confidence intervals we generated. The following exceptions were noted:"),
                           tags$ol(
@@ -344,55 +348,60 @@ All Sensitive questions have a “prefer not to answer” option.")
                      )
                    ),
                    fluidRow(
-                     column(4,
-                            imageOutput("Jamal")),
-                     column(4,
-                            imageOutput("Angie")),
-                     column(4,
-                            imageOutput("Austin"))
+                     column(3, imageOutput("Jamal")),
+                     column(4, offset = 1, h1("Jamal Nimer"), br(), h3("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games. Feel free to get in touch at jamalnimer@college.harvard.edu")),
                    ),
+                   br(),
                    fluidRow(
-                     column(4,
-                            p("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games.")
-                     ),
-                     column(4,
-                            p("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")
-                     ),
-                     column(4,
-                            p("My name is Austin Li, and I am planning on studying Physics/Math with a secondary in Computer Science. I’m interested in Asian American civic engagement and outside of class, I enjoy writing for The Crimson, playing volleyball, and playing board games! Feel free to contact me at awli@college.harvard.edu")
-                     )                     
+                     column(3, imageOutput("Lucy")),
+                     column(4, offset = 1, h1("Lucy He"), br(), h3("Hi! I’m Lucy He, a current freshman at Harvard College thinking about concentrating in computer science & math. Besides data science, I’m also a big fan of musical theater, urban planning, and more ;) You can reach me at luxihe@college.harvard.edu")),
                    ),
+                   br(),
                    fluidRow(
-                     column(4,
-                            imageOutput("Carina"),
-                            "Hello! I’m Carina, a rising sophomore from the best city Chicago and living in the best house Dunster. I was lucky to be working with a great team to investigate Harvard’s housing lottery system, and I hope to use data science in the future on issues of international development and public health. I love traveling and snacking on roasted coconut chips"
-                     ),
-                     column(4,
-                            imageOutput("Ilyas"),
-                            p("Hi I’m Ilyas, a member of the class of 2023! I hope to use my interest in data science to more effectively implement medicines and antibiotics in the future. Some of my favourite things are Lauv, tennis, and exploring new places to eat! Feel free to get in touch with me at ilyasmardin@college.harvard.edu.")
-                     ),
-                     column(4,
-                            imageOutput("Lucy"),
-                            p("Hi! I’m Lucy He, a current freshman at Harvard College thinking about concentrating in computer science & math. Besides data science, I’m also a big fan of musical theater, urban planning, and more ;) You can reach me at luxihe@college.harvard.edu")
-                     )
-
+                     column(3, imageOutput("Eliot")),
+                     column(4, offset = 1, h1("Eliot Min"), br(), h3("Hello! My name is Eliot and I’m a member of the class of 2023. I hope to use my data analysis skills to investigate speculative claims and unsubstantiated theories, as we did with Harvard College’s housing day. Outside of data science, I’m an a cappella junkie, diehard New York Mets fan, and sushi addict.")),
                    ),
+                   br(),
                    fluidRow(
-                     column(4,
-                            imageOutput("Sam"),
-                            p("My name is Sam (Sam'aan) Saba, and I am a rising Palestinian-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
-                     ),
-                     column(4,
-                            imageOutput("Eliot"),
-                            p("Hello! My name is Eliot and I’m a member of the class of 2023 here at Harvard. I hope to use my newly learned data analyzing skills to investigate speculative claims and unsubstantiated theories, as we did with Harvard College’s housing day. Outside of data science, I’m an a cappella junkie, diehard New York Mets fan, and sushi addict.")
-                     ),
-                     column(4,
-                            imageOutput("Shojeh"),
-                            p("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")
-                     )
-                   
-
-                          )))
+                     column(3, imageOutput("Austin")),
+                     column(4, offset = 1, h1("Austin Li"), br(), h3("My name is Austin Li, and I am planning on studying Physics/Math with a secondary in Computer Science. I’m interested in Asian American civic engagement and outside of class, I enjoy writing for The Crimson, playing volleyball, and playing board games! Feel free to contact me at awli@college.harvard.edu")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Shojeh")),
+                     column(4, offset = 1, h1("Shojeh Liu"), br(), h3("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Ilyas")),
+                     column(4, offset = 1, h1("Ilyas Mardin"), br(), h3("Hi I’m Ilyas, a member of the class of 2023! I hope to use my interest in data science to more effectively implement medicines and antibiotics in the future. Some of my favourite things are Lauv, tennis, and exploring new places to eat! Feel free to get in touch with me at ilyasmardin@college.harvard.edu.")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Carina")),
+                     column(4, offset = 1, h1("Carina Peng"), br(), h3("Hello! I’m Carina, a rising sophomore from the best city Chicago and living in the best house Dunster. I hope to use data science in the future on issues of international development and public health. I love traveling and snacking on roasted coconut chips.")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Sam")),
+                     column(4, offset = 1, h1("Sam Saba"), br(), h3("My name is Sam (Sam'aan) Saba, and I am a rising Palestinian-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! I'm involved with the Arab organizations on campus, and love exploring languages!"))
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Angie")),
+                     column(4, offset = 1, h1("Angie"), br(), h3("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")),
+                   ),
+                   br(),
+                   br()
+                   ))
+# 
+#  Though I love spending time on data analysis and visualizations, 
+# I also work with the Arab Conference at Harvard, Harvard's Act on a
+# Dream (the college's immigrant-advocacy organization), and the Society of Arab Students!
+# Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), 
+# eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: 
+# reading religious texts,
+# writing, learning about his culture, and spending countless hours on TikTok ;)!
 
 
 server <- function(input, output) {
@@ -903,7 +912,7 @@ This likely causes the discrepancy seen here.")
   output$segregationGraphs <- renderPlot({
     
     asians <- ggplot(ethnicities %>% filter(prop_asian > 0) %>% count(prop_asian), aes(x = prop_asian, y = n/46)) +
-      geom_col(width = .05) +
+      geom_col(width = .05, fill = "#00BFC4") +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of Asian students within blocking group", 
@@ -916,7 +925,7 @@ This likely causes the discrepancy seen here.")
       theme(title = element_text(family = "Avenir")) 
     
     whites <- ggplot(ethnicities%>%filter(prop_white > 0) %>% count(prop_white), aes(x = prop_white, y = n/57)) +
-      geom_col(width = .05) +
+      geom_col(width = .05, fill = "#00BFC4") +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of White students within blocking group", 
@@ -936,7 +945,7 @@ This likely causes the discrepancy seen here.")
   output$genderGraphs <- renderPlot({
     
     females <- ggplot(gender %>% filter(prop_female > 0) %>% count(prop_female), aes(x=prop_female, y = n/55)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
       labs(x = "Percentage of female students within blocking group", 
@@ -949,7 +958,7 @@ This likely causes the discrepancy seen here.")
       theme(title = element_text(family = "Avenir")) 
     
     males <- ggplot(gender %>% filter(prop_male > 0) %>% count(prop_male), aes(x=prop_male, y = n/49)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
       labs(x = "Percentage of male students within blocking group", 
@@ -968,7 +977,7 @@ This likely causes the discrepancy seen here.")
   output$sexualOrientationGraphs <- renderPlot({
     
     heterosexuals <- ggplot(orientations %>% filter(prop_heterosexual > 0) %>% count(prop_heterosexual), aes(x=prop_heterosexual, y = n/70)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of heterosexual students within blocking group", 
@@ -981,7 +990,7 @@ This likely causes the discrepancy seen here.")
       theme(title = element_text(family = "Avenir")) 
     
     homosexuals <- ggplot(orientations %>% filter(prop_homosexual > 0) %>% count(prop_homosexual), aes(x=prop_homosexual, y = n/20)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of homosexual students within blocking group", 
@@ -1001,7 +1010,8 @@ This likely causes the discrepancy seen here.")
     
     
     suitemate_size_relationship %>%
-      ggplot(aes(x = size, y = perc_blockwithsuite))+geom_point() +
+      ggplot(aes(x = size, y = perc_blockwithsuite))+
+      geom_point(color = "#F8766D") +
       geom_smooth(method = "lm", se = F, color = "#00BFC4") + 
       labs(x = "Size of Freshman Dorm",
            y = "Percentage of blocking groups containing 2+ suitemates from dorm",
@@ -1047,7 +1057,7 @@ This likely causes the discrepancy seen here.")
   output$varsityPerBlock <- renderPlot({
     
     ggplot(varsity_per_block, aes(x = fct_reorder(house, (average_varsity)), y = average_varsity)) +
-      geom_col() + 
+      geom_col(fill = "#00BFC4") + 
       labs(x = "House Placement",
            y = "Average Varsity athletes per blocking group",
            title = "Varsity Athletes per Blocking Group") +
@@ -1055,6 +1065,30 @@ This likely causes the discrepancy seen here.")
       theme(plot.title = element_text(hjust = 0.5)) +
       theme(text = element_text(family = "Avenir")) +
       theme(title = element_text(family = "Avenir")) 
+  })
+  
+  output$approvalRate <- renderPlot({
+    
+    # creates a tibble with the average approval rate for each house.
+    
+    house_approval <- official_housing %>% 
+      group_by(house) %>% 
+      select(house, approval) %>% 
+      summarize(mean = mean(approval, na.rm = TRUE))
+    
+    # creates a plot of the tibble above and reorders the x-axis.
+    
+    ggplot(house_approval, aes(x = reorder(house, mean), mean)) +
+      geom_col(fill = "#00BFC4") + 
+      labs(x = "House Placement",
+           y = "Approval Rating (%)",
+           title = "Percent Approval Rating by House") +
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) +
+      scale_y_continuous(labels = c("0%","25%","50%","75%","100%"))
+      
   })
   
   output$chisq_houses <- render_gt({
