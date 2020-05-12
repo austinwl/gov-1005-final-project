@@ -390,14 +390,6 @@ ui <- navbarPage(fluid = T,
                    br(),
                    br()
                    ))
-# 
-#  Though I love spending time on data analysis and visualizations, 
-# I also work with the Arab Conference at Harvard, Harvard's Act on a
-# Dream (the college's immigrant-advocacy organization), and the Society of Arab Students!
-# Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), 
-# eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: 
-# reading religious texts,
-# writing, learning about his culture, and spending countless hours on TikTok ;)!
 
 
 server <- function(input, output) {
