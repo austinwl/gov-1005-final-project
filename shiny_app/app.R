@@ -181,11 +181,10 @@ ui <- navbarPage(fluid = T,
                  "Harvard Housing",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with the Crimson's results, we can be more confident that our data is representative of the class. All in all, our data shows very similar demographic distributions. For Gender, International students, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian, and White was combined with Middle Eastern/North African, we saw that our numbers  differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not provide a definition for legacy."),
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match the Crimson's results, we can be more confident that our data is representative of the class. Our data shows similar demographic distributions. For Gender, International Students, and Financial Aid distributions, percentages differ by less than 2%. For Ethnicity, we included Middle Eastern/North African as an option, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian, and Middle Eastern/North African was combined with White, we saw that our numbers differed by less than 1%. Our distribution differed significantly from the Crimson's for Legacy Students and Athletes However, this is largely due to a difference in definitions. The Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyone with related Harvard Alumni as legacy, whereas we did not provide a definition for legacy."),
                           
-                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for international students, ethnicity, financial aid, gender, legacy students, and varsity athlete composition of the class of 2023."),
+                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for International Students, Ethnicity, Financial Aid, Gender, Legacy Students, and Varsity Athlete composition of the class of 2023."),
                           
-                          p("Side-by-side comparison of our data's demographics vs The Crimson demographics"),
                           selectInput("type",
                                       label = "Select a distribution to compare:",
                                       choices = c("International Students" = "International",
@@ -225,7 +224,7 @@ ui <- navbarPage(fluid = T,
                                                              "Financial Aid Students" = "prop_financial_aid",
                                                              "Blocking Group Sizes" = "prop_group_size")),
                                      mainPanel(
-                                       p("Pick two neighborhoods (we added the River as a section for your convenience) and a variable to view a side-by-side comparison! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
+                                       p("Pick two neighborhoods (we added the River as a section for your convenience) and a variable to view a side-by-side comparison! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 simulations of a randomized housing day."),
                                        plotOutput("graphsTogether", width = "150%") %>%
                                          withSpinner(color="#0dc5c1"),
                                        br(),
@@ -240,7 +239,7 @@ ui <- navbarPage(fluid = T,
                                                              "Students on Financial Aid" = "prop_financial_aid",
                                                              "Blocking Group Sizes" = "prop_group_size")
                                      ),
-                                     p("Select a variable to see its distributions across all 12 upperclassmen houses! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
+                                     p("Select a variable to see its distribution across all 12 upperclassmen houses! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 simulations of a randomized housing day."),
                                      mainPanel(
                                        plotOutput("allHouses", width = "160%", height = "500px") %>%
                                          withSpinner(color="#0dc5c1"),
@@ -250,6 +249,14 @@ ui <- navbarPage(fluid = T,
                             )),
                 tabPanel("Other Trends",
                          navlistPanel(
+                           tabPanel("Varsity Athletes",
+                                    titlePanel("Varsity Athletes per Blocking Group"),
+                                    p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group."),
+                                    plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")),
+                           tabPanel("House Approval Rate",
+                                    titlePanel("House Approval Rate"),
+                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best. As expected those quaded were far less likely to think their house is the best house compared to their river counterparts (Cabot: 61.5%, Pfoho: 60.0%, Currier: 36.8%). Those placed in Currier were the least happy with the outcome of their housing day. On the other hand, 100% of those placed in Lowell reported that their house was the best house. Future projects that follow the Class of 2023's satisfaction with their housing assignment could provide a longitudinal analysis of satisfaction over time."),
+                                    plotOutput("approvalRate") %>% withSpinner(color="#0dc5c1")),
                            tabPanel("Self-Segregation",
                                     titlePanel("Self-Segregation by Race"),
                                     p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions."),
@@ -261,12 +268,18 @@ ui <- navbarPage(fluid = T,
                                     plotOutput("sexualOrientationGraphs", width = "110%") %>%
                                       withSpinner(color="#0dc5c1"),
                                     titlePanel("Self-Segregation by Gender"),
-                                    p("Finally, we also investigated gender distribution across blocking groups and found segregation occured in that realm also. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
+                                    p("Students also self-segregated along gender lines. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
                                     plotOutput("genderGraphs", width = "110%") %>%
                                       withSpinner(color="#0dc5c1"),
                                     br(),
                                     br()
                            ),
+                           tabPanel("Legacy",
+                                    titlePanel("Legacy Student House Assignments"),
+                                    p("A common myth of the housing process is that legacy students get the same house as their relatives. To investigate this claim, we used the responses of all legacy students who reported their relative's house. Of the 86 respondents who provided this information, 7 of them were placed in the same house as their relative (8.1%). Statistically, we expect that one out of every twelve legacy students will be placed in the same house as their relative (8.3%) since in a random process, there should always be a one out of twelve chance to get any house. The official housing almost perfectly matches our expectation with a negligible difference between the two proportions (-0.2%). Legacy students are not any more likely to be placed in their relative's house than another house."),
+                                    mainPanel(
+                                      plotOutput("relative_house", width = "140%")
+                                      )),
                            tabPanel("Suitemates & Dorm Size",
                                     titlePanel("Blocking with your Suitemates"),
                                     p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
@@ -274,37 +287,29 @@ ui <- navbarPage(fluid = T,
                                       withSpinner(color="#0dc5c1")),
                            tabPanel("Freshman Dorm",
                                     titlePanel("Freshman Dorm"),
-                                    p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the small population size (14 members). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
+                                    p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this is likely attributable to the small sample size of Massachusetts Hall residents (14 individuals). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about 40 percent of its members heading for the quad next year."),
                                     plotOutput("whereDoTheyGo") %>%
-                                      withSpinner(color="#0dc5c1")),
-                           tabPanel("Varsity Athletes",
-                                    titlePanel("Varsity Athletes per Blocking Group"),
-                                    p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
-                                    plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")),
-                           tabPanel("House Approval Rate",
-                                    titlePanel("House Approval Rate"),
-                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best. As expected those quaded were far less likely to think their house is the best house compared to their river counterparts (Cabot: 61.5%, Pfoho: 60.0%, Currier: 36.8%). Those placed in Currier were the least happy with the outcome of their housing day. On the other hand, 100% of those placed in Lowell reported that their house was the best house. Future projects that follow the Class of 2023's satisfaction with their housing assignment could provide a longitudinal analysis of satisfaction over time."),
-                                    plotOutput("approvalRate") %>% withSpinner(color="#0dc5c1"))
+                                      withSpinner(color="#0dc5c1"))
                            )),
                 
                 
                  tabPanel("Discussion",
                           titlePanel("Data Collection"),
                           p("To collect our data, we sent an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates)."),
-                          p("We collected 583 (35.6% of the 1637 first-years) responses through the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
+                          p("We collected 583 (35.6% of the 1637 first-years) responses through the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to do so following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, we still had a large enough (and representative) dataset to produce meaningful analysis."),
                           p("We made sure there was no double counting in the list of 1180 students (there was potential for overlap between the 583 students that filled out the survey and the names of the blocking group members we pulled from each person's response). To do so, we matched every respondent and blocking group member to their result in the Harvard College Facebook. We then took out any duplicates once spelling was standardized. Due to the sensitive information collected in this survey like financial aid status and sexual orientation, we decided not to make the data publicly available."),
                           titlePanel("Randomization Process"),
-                          p("To simulate the housing process, we [1] identified blocking groups, [2] selected blocking groups at random and assigned them to a house until the house was full (we referenced official house sizes to determine how many students to assign to the house), [3] repeated step 2 for each house. Once we completed the assignment process, we generated summary statistics for the house using the 9 individual variables and the group size. We repeated this process 500 times and created confidence intervals for each variable using the summary statistics for each house. We also generated summary statistics and confidence intervals for each neighborhood (the \"River\" as a whole was added as a single neighborhood - even though it technically consists of three neighborhoods: River West, River Central, and River East - to compare the River to the Quad more conveniently)."),
+                          p("To simulate the housing process, we [1] identified blocking groups, [2] selected blocking groups at random and assigned them to a house until the house was full (we referenced official house sizes to determine how many students to assign to the house), [3] repeated step 2 for each house. Once we completed the assignment process, we generated summary statistics for the house using the 9 individual variables and the group size. We repeated this process 500 times and created confidence intervals for each variable using the summary statistics for each house. We also generated summary statistics and confidence intervals for each neighborhood (the \"River\" as a whole was added as a single neighborhood even though it technically consists of three neighborhoods: River West, River Central, and River East. This made Quad-River comparisons more convenient)."),
                           titlePanel("Goodness of Fit"),
-                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated the same summary statistics for each house and neighborhood for both the random simulation and the official data. To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used a chi-squared test and confidence intervals."),
+                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated the same summary statistics for each house and neighborhood for both the random simulation and the official data. To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used confidence intervals and a chi-squared test."),
                           h4("Confidence Intervals"),
                           p("As can be seen on the \"Comparisons\" tab, there are very few variables that fall outside of the 95% confidence intervals we generated. The following exceptions were noted:"),
                           tags$ol(
                             tags$li("International Students in Cabot: 2.6% of students in Cabot are international which is below the lower bound of the 95% confidence interval (2.94%)."),
                             tags$li("Financial Aid in Eliot: 44.6% of students in Eliot are on financial aid which is below the the lower bound of the 95% confidence interval (47.2%)."),
-                            tags$li("Group Size in Adams: The average blocking group size in Adams is 6.86 students which is above the upper bound of the 95% confidence interval (6.78 students)"),
-                            tags$li("Group Size in Mather: The average blocking group size in Mather is 6.92 students which is above the upper bound of the 95% confidence interval (6.89 students)"),
-                            tags$li("Financial Aid in River West: 51.4% of students in River West are on financial aid which is below the lower bound of the 95% confidence interval (52.3%). This is largely due to the low proportion of students on financial aid in Eliot, but both other River West houses (Kirkland and Winthrop) have financial aid proportions below the median value generated in our random simulation (Kirkland has 56.4% of students on financial aid which is below the median value of 61.0% and Winthrop has 55.6% of students on financial aid which is below the median value of 61.5%).")
+                            tags$li("Group Size in Adams: The average blocking group size in Adams is 6.86 students which is above the upper bound of the 95% confidence interval (6.78 students)."),
+                            tags$li("Group Size in Mather: The average blocking group size in Mather is 6.92 students which is above the upper bound of the 95% confidence interval (6.89 students)."),
+                            tags$li("Financial Aid in River West: 51.4% of students in River West are on financial aid which is below the lower bound of the 95% confidence interval (52.3%). This is largely due to the low proportion of students on financial aid in Eliot, but both other River West houses (Kirkland and Winthrop) have financial aid proportions below the median value generated from our random simulations (Kirkland has 56.4% of students on financial aid which is below the median value of 61.0% and Winthrop has 55.6% of students on financial aid which is below the median value of 61.5%).")
                           ),
                           h4("Chi-squared Test"),
                           p("Besides generating confidence intervals and comparing the results to the raw data, we also conducted a chi-squared test for the houses and the neighborhoods. The chi-squared test checks for a goodness-of-fit to determine if there is a statistically significant difference between two distributions of categorical variables. The two distributions passed into the chi-squared test were 1. the median values for five summary statistics (international students, varsity students, legacy students, financial aid, blocking group size) produced by our random simulation, and 2. the official values for these variables based on the college's official housing process. A p-value below 0.05 suggests that there is a statistically significant difference between the two distributions. Therefore for our purposes, if the p-value is below 0.05, then there is a statistically significant difference between our random simulation and the official housing process. If the p-value is above 0.05, there is no statistically-significant difference between the two distributions and we cannot reject the null hypothesis. In other words, if p < 0.05, there is evidence of bias in the housing process, but if p > 0.05, then there is not enough evidence to say the process isn't random."),
@@ -314,15 +319,15 @@ ui <- navbarPage(fluid = T,
                             column(3, offset = 2, gt_output("chisq_neighborhoods"))
                           ),
                           br(),
-                          p("Each of the five variables have p-values far above 0.05 for analysis on the house and neighborhood level. This suggests that there is not evidence to reject the null hypothesis and we cannot conclude that Harvard's housing is not random. This is consistent with previous findings on Harvard's housing process. Paired with the very few observations that fall outside of our confidence intervals, it appears that Harvard continues to run a relatively random process."),
+                          p("Each of the five variables have p-values far above 0.05 for analysis on the house and neighborhood level. This suggests that there is not enough evidence to reject the null hypothesis and we cannot conclude that Harvard's housing is not random. This is consistent with previous findings on Harvard's housing process. Paired with the very few observations that fall outside of our confidence intervals, it appears that Harvard continues to run a relatively random process."),
                           
                           titlePanel("Areas of Improvement"),
                           h4("Data Collection"),
-                          p("We were able to collect data for 72.1% of the class but nearly a third of the data was left out of our study. Due to campus evacuation, we were unable to collect data in person at the College. An opportunity to publicize the survey in first-year common spaces would have increased the available information for our analysis."),
+                          p("We were able to collect data for 72.1% of the class but we still missed 27.9% of the data. Due to campus evacuation, we were unable to collect data in person at the College. An opportunity to publicize the survey in first-year common spaces would have increased the available information for analysis."),
                           h4("Randomization"),
                           p("Every randomization process has its own biases. A good randomization process minimizes these biases. For our randomization process, there were a number of tradeoffs we made. The most important tradeoff was between uniform variable distributions versus adjusted distributions based on house size. If we assigned the same number of students to each house, we would have been more likely to get a uniform distribution for the variables in each house. We did not believe this simulated the actual limitations of the housing process and so we sacrificed a more uniform distribution for what we believe more accurately represents the housing process."),
                           h4("Fairness"),
-                          p("We chose to use confidence intervals and a chi-squared test to determine whether or not Harvard's housing process is \"fair.\" A different definition or methodology could have easily produced a different conclusion. While we considered using a numeric approach to determine \"fairness\" (a sum of residuals between the observed variable distribution and the expected variable distribution from the random simulation), we decided against this strategy because unlike the chi-squared test, there was no objective measure for what benchmark would indicate an unfair housing process."),
+                          p("We chose to use confidence intervals and a chi-squared test to determine whether or not Harvard's housing process is \"fair.\" A different definition or methodology could have easily produced a different conclusion. While we considered using a numeric approach to determine \"fairness\" (a sum of residuals between the observed variable distribution and the expected variable distribution from the random simulation), we decided against this strategy because unlike the chi-squared test, there was no objective benchmark that would indicate an unfair housing process."),
                           br()
                           ),
                 
@@ -343,6 +348,10 @@ ui <- navbarPage(fluid = T,
                             titlePanel("About Us")
                      )
                    ),
+                   
+                   # Images and Bios below.
+                   
+                   
                    fluidRow(
                      column(3, imageOutput("Jamal")),
                      column(4, offset = 1, h1("Jamal Nimer"), br(), h3("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games. Feel free to get in touch at jamalnimer@college.harvard.edu")),
@@ -503,10 +512,11 @@ This likely causes the discrepancy seen here.")
         input$neighborhood_1 == "river_central" ~ "River Central")
       ),
       x = xlabel,
-      y = "Replicates",
+      y = "Simulations",
       subtitle = "Red bars represent confidence intervals") + 
       theme_classic() + 
       theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.subtitle = element_text(hjust = 0.5)) +
       theme(text = element_text(family = "Avenir")) +
       theme(title = element_text(family = "Avenir")) 
     
@@ -534,10 +544,11 @@ This likely causes the discrepancy seen here.")
         input$neighborhood_2 == "river_central" ~ "River Central")
       ),
       x = xlabel,
-      y = "Replicates",
+      y = "Simulations",
       subtitle = "Red bars represent confidence intervals") + 
       theme_classic() + 
       theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.subtitle = element_text(hjust = 0.5)) +
       theme(text = element_text(family = "Avenir")) +
       theme(title = element_text(family = "Avenir")) 
     
@@ -565,7 +576,7 @@ This likely causes the discrepancy seen here.")
       input$variable2 == "prop_group_size" ~ "Average Blocking Group Size"
     )
     
-    ylabel <- "Replicates"
+    ylabel <- "Simulations"
     
     xscale <- case_when(
       input$variable2 == "prop_international" ~ c(0, .3),
@@ -991,6 +1002,57 @@ This likely causes the discrepancy seen here.")
       theme(title = element_text(family = "Avenir")) 
     
     plot_grid(homosexuals, heterosexuals)
+    
+  })
+  
+  output$relative_house <- renderPlot({
+    
+    # selects legacy students who reported their relative's house
+    
+    legacy <- official_housing %>% 
+      filter(!is.na(relative_house)) %>% 
+      mutate(same_house = ifelse(house == relative_house, TRUE, FALSE)) %>% 
+      select(same_house)
+    
+    # number of legacy students who reported their relative's house
+    
+    total <- legacy %>% 
+      count()
+    
+    # number of legacy students who reported their relative's house and got the same house
+    
+    same_house <- legacy %>% 
+      filter(same_house) %>% 
+      count()
+    
+    # proportion of legacy students who reported their relative's house and got the same house; observed and expected
+    
+    percent_same_observed <- round(as.numeric(same_house / total)*100, digits = 1)
+    
+    percent_same_expected <- round(as.numeric(1/12)*100, digits = 1)
+    
+    # tibble with the proportion of students who got the same house and different house
+    
+    observed_distribution <- data.frame(
+      Type = c("Same House", "Different House"),
+      Percentage = c(percent_same_observed, 100 - percent_same_observed)
+    )
+    
+    # the same tibble but for the expected distribution which is 1/12
+    
+    expected_distribution <- data.frame(
+      Type = c("Same House", "Different House"),
+      Percentage = c(percent_same_expected, 100 - percent_same_expected)
+    )
+
+    # creates pie graphs for the expected and observed distributions for legacy
+    
+    expectation <- create_pie(observed_distribution, "Observed Legacy Placement")
+
+    observed <- create_pie(expected_distribution, "Expected Legacy Placement")
+
+    plot_grid(expectation, observed)
+
     
   })
   

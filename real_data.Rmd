@@ -111,14 +111,26 @@ quad <- all_communities %>%
 ```
 
 ```{r}
-  house_approval <- official_housing %>% 
-      group_by(house) %>% 
-      select(house, approval) %>% 
-      summarize(mean = mean(approval, na.rm = TRUE))
 
-house_approval %>% 
-  arrange(desc(mean))
+legacy <- official_housing %>% 
+  filter(!is.na(relative_house)) %>% 
+  mutate(same_house = ifelse(house == relative_house, TRUE, FALSE)) %>% 
+  select(same_house)
+  
+total <- legacy %>% 
+  count()
 
+same_house <- legacy %>% 
+  filter(same_house) %>% 
+  count()
+
+prop <- same_house / total
+
+
+
+ggplot(prop, aes(x = prop)) + geom_col()
+
+# chisq.test(legacy$house, legacy$relative_house)
 
 ```
 

@@ -120,7 +120,7 @@ our_finaid <- data.frame(
 )
 
 our_international <- data.frame(
-  Type = c("International", "Not International "),
+  Type = c("International", "Not International"),
   Percentage = c(round(mean(official_housing$international, na.rm = TRUE)*100, digits = 1), 100-round(mean(official_housing$international, na.rm = TRUE)*100, digits = 1))
 )
 
@@ -130,7 +130,7 @@ our_legacy <- data.frame(
 )
 
 our_athletes <- data.frame(
-  Type = c("Varsity  Athlete", "Not a Varsity Athlete"),
+  Type = c("Varsity Athlete", "Not a Varsity Athlete"),
   Percentage = c(round(mean(official_housing$varsity, na.rm = TRUE)*100, digits = 1), 100-round(mean(official_housing$varsity, na.rm = TRUE)*100, digits = 1))
 )
 
