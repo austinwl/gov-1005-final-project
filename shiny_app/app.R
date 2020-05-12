@@ -178,7 +178,7 @@ chisq_neighborhoods <- readRDS("chisq_neighborhoods.RDS")
 
 ui <- navbarPage(fluid = T,
                  theme = shinytheme("simplex"),
-                 "Blocking Project",
+                 "Harvard Housing",
                  tabPanel("Data Validation",
                           titlePanel("Data Validation"),
                           p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match up with the Crimson's results, we can be more confident that our data is representative of the class. All in all, our data shows very similar demographic distributions. For Gender, International students, and Financial Aid distributions, percentages differ by less than 2%. With ethnicity, we collected Middle Eastern/North African, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian, and White was combined with Middle Eastern/North African, we saw that our numbers  differed by less than 1%. Our numbers differed significantly with Crimson data in the demographics of legacy students and athletes. However, this is easily explained when considering that the Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyobody with any related Harvard Alumni as legacy, whereas we did not provide a definition for legacy."),
@@ -330,30 +330,17 @@ ui <- navbarPage(fluid = T,
                  tabPanel("About",
                    fluidRow(
                      column(12,
-                            h3("Project Background and Motivations")
+                            titlePanel("Project Background and Motivations")
                      )
                    ),
                    fluidRow(
                      column(12,
-                            p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
-               This project aims to continue the work of the previous blocking group project with more rigorous data analytics and statistical computation, more intuitive graph design, and additional questions (including sexual orientation). It will hopefully build on the previous analysis attempting to find any discrepancies.
-              
-
-The project will attempt to replicate a truly random housing lottery to assess if Harvard’s housing appears to be random as well. The project will check variables such as legacy, race, religion, athletics, sex, freshman dorm, financial aid, international students, and blocking group size.
-
-All Sensitive questions have a “prefer not to answer” option.")
+                            h4("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to use data as a tool for tackling some of the myths and stereotypes about housing day. This project aims to continue a tradition of looking at Harvard's housing process to determine whether the process is fair. We built off of last year's work by producing more rigorous data analysis and statistical computation, more intuitive graph design, and additional questions (including sexual orientation).")
                      )
                    ),
                    fluidRow(
                      column(3,
-                            h3("About Us")
-                     )
-                   ),
-                   fluidRow(
-                     column(12,
-                            p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
-             Jamal Nimer, Carina Peng, Ilyas Mardin, Shojeh Liu, Eliot Min, Lucy He, Angie Shin, Austin Li, and Sam Saba.
-               ")
+                            titlePanel("About Us")
                      )
                    ),
                    fluidRow(
