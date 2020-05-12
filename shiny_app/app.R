@@ -185,7 +185,7 @@ ui <- navbarPage(fluid = T,
                           
                           p("Click the dropdown menu to see how our data stacks up against the Crimson's for international students, ethnicity, financial aid, gender, legacy students, and varsity athlete composition of the class of 2023."),
                           
-                          p("Side-by-side comparison of our data's demographics vs The Crimson emographics"),
+                          p("Side-by-side comparison of our data's demographics vs The Crimson demographics"),
                           selectInput("type",
                                       label = "Select a distribution to compare:",
                                       choices = c("International Students" = "International",
