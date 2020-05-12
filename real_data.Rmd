@@ -122,7 +122,6 @@ house_approval <- official_housing %>%
 
 ```
 
-
 ```{r saveRDS}
 # saveRDS(object = assigned_all, file = "shiny_app/updated_fake_data.RDS")
 

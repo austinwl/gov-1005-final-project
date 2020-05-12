@@ -272,11 +272,7 @@ ui <- navbarPage(fluid = T,
                              titlePanel("Blocking with your Suitemates"),
                                       p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
                                      plotOutput("suitemateSizeRelationship") %>% 
-                                       withSpinner(color="#0dc5c1"),
-                           titlePanel("Blocking Group Size and Linking"),
-                           p("We were also interested in how blocking group size was related to whether groups linked with another blocking group. Our collected data shows that there is a slight negative correlation between blocking group size and the chance of a group linking with another group (a smaller-sized blocking group is, according to our dataset, more frequently paired with a linking counterpart). The visual below is jittered to provide a more clear view of the data."),
-                           plotOutput("linkVsGroupSize")%>%
-                             withSpinner(color="#0dc5c1")),
+                                       withSpinner(color="#0dc5c1")),
                   tabPanel("Miscellaneous",
                            titlePanel("Freshman Dorm"),
                            p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the small population size (14 members). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
@@ -290,8 +286,23 @@ ui <- navbarPage(fluid = T,
                 
                  tabPanel("Discussion",
                           titlePanel("Data Collection"),
-                          p("To collect our data, we sent out an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates). We collected 583 (35.6% of the 1637 first-years) responses from the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
-                          titlePanel("Potential Discrepancies in Data Collection/Collection Process"),
+                          p("To collect our data, we sent an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates)."),
+                          p("We collected 583 (35.6% of the 1637 first-years) responses from the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, it still gave us a large enough dataset to produce meaningful analysis."),
+                          p("We made sure there was no double counting in the list of 1180 students (there was potential for overlap between the 583 students that filled out the survey and the names of the blocking group members we pulled from each person's response). To do so, we matched every respondent and blocking group member to their result in the Harvard College Facebook. We then took out any duplicates once spelling was standardized. Due to the sensitive information collected in this survey like financial aid status and sexual orientation, we decided not to make the data publicly available."),
+                          titlePanel("Randomization Process"),
+                          p("To simulate the housing process, we [1] identified blocking groups, [2] selected blocking groups at random and assigned them to a house until the house was full (we referenced official house sizes to determine how many students to assign to the house), [3] repeated step 2 for each house. Once we completed the assignment process, we generated summary statistics for the house using the 9 individual variables and the group size. We repeated this process 500 times and created confidence intervals for each variable using the summary statistics for each house. We also generated summary statistics and confidence intervals for each neighborhood (the \"River\" as a whole was added as a single neighborhood - even though it technically consists of three neighborhoods: River West, River Central, and River East - to compare the River to the Quad more conveniently)."),
+                          titlePanel("Goodness of Fit"),
+                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated summary statistics for each house and neighborhood with the same methodology used for the random housing process (we used the official housing assignments and collected the same summary statistics). To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used a chi-squared test and confidence intervals."),
+                          h4("Confidence Intervals"),
+                          p("As can be seen on the \"Comparisons\" tab, there are very few variables that fall outside of the 95% confidence intervals we generated. The following exceptions were noted:"),
+                          tags$ol(
+                            tags$li("International Students low in Cabot: 2.6%"),
+                            tags$li("Financial Aid low in Eliot: 44.6%"),
+                            tags$li("Group Size large in Adams: 6.86"),
+                            tags$li("Group Size large in Mather: 6.92"),
+                            tags$li("Financial Aid low in River West: 51.4%")
+                          ),
+                          h4("Chi-squared Test"),
                           p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible."),
                           gt_output("chisq_houses"),
                           gt_output("chisq_neighborhoods")
@@ -369,7 +380,7 @@ All Sensitive questions have a “prefer not to answer” option.")
                    fluidRow(
                      column(4,
                             imageOutput("Sam"),
-                            p("My name is Sam (Sam'aan) Saba, and I am a rising Palestiniain-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
+                            p("My name is Sam (Sam'aan) Saba, and I am a rising Palestinian-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! Though I love spending time on data analysis and visualizations, I also work with the Arab Conference at Harvard, Harvard's Act on a Dream (the college's immigrant-advocacy organization), and the Society of Arab Students! Besides my extracurriculars, I love exploring languages (he's been working on his classical Arabic), eating white chocolate, and watching Avatar: The Last Airbender. Some of my interests include: reading religious texts, writing, learning about his culture, and spending countless hours on TikTok ;)!")
                      ),
                      column(4,
                             imageOutput("Eliot"),
@@ -1002,32 +1013,6 @@ This likely causes the discrepancy seen here.")
       theme(title = element_text(family = "Avenir")) 
   })
   
-  output$linkVsGroupSize <- renderPlot({
-    
-    
-    links_n_sizes <- official_housing %>% 
-      select(group_name, linking) %>% 
-      mutate(is_linking = 
-               ifelse(!is.na(linking), 1, 0)) %>% 
-      group_by(group_name, is_linking) %>% 
-      summarize(group_size = n()) %>% 
-      ungroup() %>% filter(group_size < 9)
-    
-    ggplot(links_n_sizes, aes(x = is_linking, y = group_size)) + 
-      geom_jitter() + 
-      geom_smooth(method = "lm", se = FALSE, color = "#00BFC4") +
-      scale_y_continuous(limits = c(0, 8)) +
-      scale_x_continuous(limits = c(0, 1), breaks = c(0.2,0.8), labels = c("not linked", "linked")) + 
-      labs(x = "Presence of a Linking Group",
-           y = "Blocking Group Size",
-           title = "Blocking Group Size vs Presence of a Linking Group") +
-      theme_classic() + 
-      theme(plot.title = element_text(hjust = 0.5)) +
-      theme(text = element_text(family = "Avenir")) +
-      theme(title = element_text(family = "Avenir")) 
-    
-    
-  })
   output$whereDoTheyGo <- renderPlot({
     
     totals <- official_housing %>%
