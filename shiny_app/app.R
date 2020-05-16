@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(cowplot)
 library(gifski)
 library(png)
+library(gt)
 
 # READING IN DATA FILES
 
@@ -134,10 +135,13 @@ create_pie <- function(data, title) {
     ggplot(aes(x = 2, y = Percentage, fill = Type)) +
     geom_bar(stat="identity", color = "white") +
     coord_polar(theta = "y", start = 0)+
-    geom_text(aes( y = lab.ypos, label = paste(Percentage, "%")), color = "Black")+
+    geom_text(aes( y = lab.ypos, label = paste(Percentage, "%")), color = "Black", family = "Avenir")+
     theme_void()+
     labs(title = title,
          fill = NULL) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(text = element_text(family = "Avenir")) +
+    theme(title = element_text(family = "Avenir")) + 
     xlim(.5, 2.5)
 }
 
@@ -166,11 +170,21 @@ ethnicity <- function(community) {
 }
 
 
+# for chi_sq tests
 
-ui <- navbarPage(theme = shinytheme("simplex"),
-                 "Blocking Project",
+chisq_houses <- readRDS("chisq_houses.RDS") 
+chisq_neighborhoods <- readRDS("chisq_neighborhoods.RDS")
+  
+
+ui <- navbarPage(fluid = T,
+                 theme = shinytheme("simplex"),
+                 "Harvard Housing",
                  tabPanel("Data Validation",
-                          "Side-by-side comparison of our data's demographics vs The Crimson emographics",
+                          titlePanel("Data Validation"),
+                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. The Crimson's survey is sent to all Harvard First Years, so if our demographics match the Crimson's results, we can be more confident that our data is representative of the class. Our data shows similar demographic distributions. For Gender, International Students, and Financial Aid distributions, percentages differ by less than 2%. For Ethnicity, we included Middle Eastern/North African as an option, which the Crimson did not, and the Crimson collected South Asian, which we did not. However, when South Asian was combined with Asian, and Middle Eastern/North African was combined with White, we saw that our numbers differed by less than 1%. Our distribution differed significantly from the Crimson's for Legacy Students and Athletes However, this is largely due to a difference in definitions. The Crimson counted only recruited student athletes, whereas we counted all student athletes, and the Crimson counted anyone with related Harvard Alumni as legacy, whereas we did not provide a definition for legacy."),
+                          
+                          p("Click the dropdown menu to see how our data stacks up against the Crimson's for International Students, Ethnicity, Financial Aid, Gender, Legacy Students, and Varsity Athlete composition of the class of 2023."),
+                          
                           selectInput("type",
                                       label = "Select a distribution to compare:",
                                       choices = c("International Students" = "International",
@@ -179,8 +193,7 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                   "Financial Aid Students" = "Financial Aid",
                                                   "Ethnicity Distributions" = "Ethnicity",
                                                   "Gender Distributions" = "Gender")
-                          ),
-                          p("To gauge how representative of the class of 2023 our collected data was, we compared the demographics of our collected data to the official demographics that the Harvard Crimson tabulates annually. Click the dropdown menu to see how our data stacks up against the Crimson's for international student, ethnicity, financial aid, gender, legacy student, and varsity athete composition of the class of 2023."),
+                          ),                          
                           mainPanel(
                             plotOutput("ValGraphs", width = "140%")
                           )),
@@ -211,9 +224,11 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                              "Financial Aid Students" = "prop_financial_aid",
                                                              "Blocking Group Sizes" = "prop_group_size")),
                                      mainPanel(
-                                       p("Pick two neighborhoods (we added the River as a section for your convenience) and a variable to view a side-by-side comparison! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
+                                       p("Pick two neighborhoods (we added the River as a section for your convenience) and a variable to view a side-by-side comparison! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 simulations of a randomized housing day."),
                                        plotOutput("graphsTogether", width = "150%") %>%
-                                         withSpinner(color="#0dc5c1")
+                                         withSpinner(color="#0dc5c1"),
+                                       br(),
+                                       br()
                                      )),
                             tabPanel("Comparisons Across Houses",
                                      selectInput("variable2",
@@ -224,65 +239,166 @@ ui <- navbarPage(theme = shinytheme("simplex"),
                                                              "Students on Financial Aid" = "prop_financial_aid",
                                                              "Blocking Group Sizes" = "prop_group_size")
                                      ),
-                                     p("Select a variable to see its distributions across all 12 upperclassmen houses! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 replicates of a randomized housing day."),
+                                     p("Select a variable to see its distribution across all 12 upperclassmen houses! Turquoise bars represent the actual values we calculated through data collection, while the red bars represent 95% confidence intervals we calculated by running 500 simulations of a randomized housing day."),
                                      mainPanel(
                                        plotOutput("allHouses", width = "160%", height = "500px") %>%
-                                         withSpinner(color="#0dc5c1")
+                                         withSpinner(color="#0dc5c1"),
+                                       br(),
+                                       br()
                                      ))
                             )),
                 tabPanel("Other Trends",
                          navlistPanel(
+                           tabPanel("Varsity Athletes",
+                                    titlePanel("Varsity Athletes per Blocking Group"),
+                                    p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group."),
+                                    plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")),
+                           tabPanel("House Approval Rate",
+                                    titlePanel("House Approval Rate"),
+                                    p("Most Harvard students will tell you that their house is the best house. We asked students whether or not they believed their house was the best. As expected those quaded were far less likely to think their house is the best house compared to their river counterparts (Cabot: 61.5%, Pfoho: 60.0%, Currier: 36.8%). Those placed in Currier were the least happy with the outcome of their housing day. On the other hand, 100% of those placed in Lowell reported that their house was the best house. Future projects that follow the Class of 2023's satisfaction with their housing assignment could provide a longitudinal analysis of satisfaction over time."),
+                                    plotOutput("approvalRate") %>% withSpinner(color="#0dc5c1")),
                            tabPanel("Self-Segregation",
-                         titlePanel("Self-Segregation by Race"),
-                         p("We wanted to investigate whether students self-segregated during the blocking process. Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
-                         plotOutput("segregationGraphs", width = "110%") %>%
-                  withSpinner(color="#0dc5c1"),
-                  titlePanel("Self-Segregation by Sexual Orientation"),
-                  p("We were also curious about self-segregation among students of different sexual orientations. There was a striking divide between blocking groups that contained homosexual students and those that contained heterosexual students. The majority of groups containing at least one heterosexual member were comprised entirely of heterosexual students, while the majority of blocking groups with at least one homosexual member were less than 50% composed of homosexual members."),
-                  plotOutput("sexualOrientationGraphs", width = "110%") %>%
-                    withSpinner(color="#0dc5c1"),
-                  titlePanel("Self-Segregation by Gender"),
-                  p("
-                    Finally, we also investigated gender distribution across blocking groups and found segregation occured in that realm also. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
-                  plotOutput("genderGraphs", width = "110%") %>%
-                    withSpinner(color="#0dc5c1")),
-                  tabPanel("Correlations",
-                             titlePanel("Blocking with your Suitemates"),
-                                      p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a negative correlation between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
-                                     plotOutput("suitemateSizeRelationship") %>% 
-                                       withSpinner(color="#0dc5c1"),
-                           titlePanel("Blocking Group Size and Linking"),
-                           p("We were also interested in how blocking group size was related to whether groups linked with another blocking group. Our collected data shows that there is a slight negative correlation between blocking group size and the chance of a group linking with another group (a smaller-sized blocking group is, according to our dataset, more frequently paired with a linking counterpart). The visual below is jittered to provide a more clear view of the data."),
-                           plotOutput("linkVsGroupSize")%>%
-                             withSpinner(color="#0dc5c1")),
-                  tabPanel("Miscellaneous",
-                           titlePanel("Freshman Dorm -> House Placement"),
-                           p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this number shouldn't be weighed too heavily due to the miniscule population size (14 members). Massachusetts was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about forty percent of its members heading for the quad next year."),
-                           plotOutput("whereDoTheyGo") %>%
-                             withSpinner(color="#0dc5c1"),
-                           titlePanel("Varsity Athletes per Blocking Group"),
-                           p("Perhaps the most popular housing day theory is that athletes are most likely to be placed in a river house. However, this year, Currier House had the highest number, on average, of varsity athletes per blocking group placed into that house."),
-                  plotOutput("varsityPerBlock") %>% withSpinner(color="#0dc5c1")))),
+                                    titlePanel("Self-Segregation by Race"),
+                                    p("We wanted to investigate whether students self-segregated during the blocking process. We only showed analysis for variables and groups that contained enough data for meaningful conclusions."),
+                                    p("Our first analysis, conducted below, shows that there is some degree of self-segregation. Of all the blocking groups that contained at least one Asian student, more than twenty percent of them were comprised entirely of Asian students. On the other hand, less than ten percent of the blocking groups that contained white students were entirely white."),
+                                    plotOutput("segregationGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    titlePanel("Self-Segregation by Sexual Orientation"),
+                                    p("We were also curious about self-segregation among students of different sexual orientations. There was a striking divide between blocking groups that contained homosexual students and those that contained heterosexual students. The majority of groups containing at least one heterosexual member were comprised entirely of heterosexual students, while the majority of blocking groups with at least one homosexual member were less than 50% composed of homosexual members."),
+                                    plotOutput("sexualOrientationGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    titlePanel("Self-Segregation by Gender"),
+                                    p("Students also self-segregated along gender lines. 40 percent of blocking groups that contained a member of one gender were comprised entirely of that gender, a trend that was found in both the male and female genders."),
+                                    plotOutput("genderGraphs", width = "110%") %>%
+                                      withSpinner(color="#0dc5c1"),
+                                    br(),
+                                    br()
+                           ),
+                           tabPanel("Legacy",
+                                    titlePanel("Legacy Student House Assignments"),
+                                    p("A common myth of the housing process is that legacy students get the same house as their relatives. To investigate this claim, we used the responses of all legacy students who reported their relative's house. Of the 86 respondents who provided this information, 7 of them were placed in the same house as their relative (8.1%). Statistically, we expect that one out of every twelve legacy students will be placed in the same house as their relative (8.3%) since in a random process, there should always be a one out of twelve chance to get any house. The official housing almost perfectly matches our expectation with a negligible difference between the two proportions (-0.2%). Legacy students are not any more likely to be placed in their relative's house than another house."),
+                                    mainPanel(
+                                      plotOutput("relative_house", width = "140%")
+                                      )),
+                           tabPanel("Suitemates & Dorm Size",
+                                    titlePanel("Blocking with your Suitemates"),
+                                    p("We wanted to see if the size of a given freshman dorm impacted whether suitemates from the dorm decided to block together. The data shows a moderately strong negative correlation (r = -0.5324) between dorm size and the percentage of suitemates from each dorm that blocked together; students were more likely to block with their suitemate/multiple suitemates if they lived in a smaller freshman dorm."),
+                                    plotOutput("suitemateSizeRelationship") %>% 
+                                      withSpinner(color="#0dc5c1")),
+                           tabPanel("Freshman Dorm",
+                                    titlePanel("Freshman Dorm"),
+                                    p("In the visualization below, we have house placements arranged by freshman dorm. 100 percent of Massachusetts Hall residents were placed into a river house, but this is likely attributable to the small sample size of Massachusetts Hall residents (14 individuals). Massachusetts Hall was followed by Apley Court, which had roughly 86 percent of its members placed into a river house. Greenough had the most of its students quadded, with about 40 percent of its members heading for the quad next year."),
+                                    plotOutput("whereDoTheyGo") %>%
+                                      withSpinner(color="#0dc5c1"))
+                           )),
+                
+                
                  tabPanel("Discussion",
-                          titlePanel("Conclusions from Data Collection and Analysis"),
-                          p("A huge wrench was thrown into our data collection with the coronavirus evacuation. We are currently working on acquiring data in spite of this disruption.
-               We inputted model data into the survey we made to get preliminary graphs. More detailed work will follow with actual data collection and analysis."),
-                          titlePanel("Potential Discrepancies in Data Collection/Collection Process"),
-                          p("Since this project is heavy in raw data collection, there are possibilities for error from the respondents. Although we tried to incentivize respondents with gift cards, there might not have been strong enough of an incentive for respondents to provide accurate information, and in the rare case some might have even put in inaccurate information to blow the end result. Some survey questions regarding personal information were sensitive, and we were therefore unable to get a large sample of results that would be the perfect representation of the Class of 2023. Further, possible errors included misspellings of textual data when trying to match the names of individuals. It was common to have individual repsondents misspell the names of their block mates and their blocking group leader's names. Variations in spacing, punctuations and capitalization also required extensive data cleaning in order to provide the most accurate interpretation of the data possible.")),
-                 tabPanel("About", 
-                          titlePanel("About"),
-                          h3("Project Background and Motivations"),
-                          p("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to wield data as a tool for tackling some of the myths and stereotypes about housing day.
-               This project aims to continue the work of the previous blocking group project with more rigorous data analytics and statistical computation, more intuitive graph design, and additional questions (including sexual orientation). It will hopefully build on the previous analysis attempting to find any discrepancies.
-              
-
-The project will attempt to replicate a truly random housing lottery to assess if Harvard’s housing appears to be random as well. The project will check variables such as legacy, race, religion, athletics, sex, freshman dorm, financial aid, international students, and blocking group size.
-
-All Sensitive questions have a “prefer not to answer” option."),
-                          h3("About Us"),
-                          p("We are a group of nine students who sought to continue the work of GOV 1005 students from last year. We are
-             Jamal Nimer, Carina Peng, Ilyas Mardin, Shojeh Liu, Eliot Min, Lucy He, Angie Shin, Austin Li, and Sam Saba.
-               ")))
+                          titlePanel("Data Collection"),
+                          p("To collect our data, we sent an email three times to all first-years at the College. We used a total of 16 variables from the survey: 3 unique identifiers (name, blocking group name, blocking group leader), 9 individual variables (freshman dorm, gender, ethnicity, religion, sexual orientation, international student, varsity status, legacy, financial aid), and 4 group variables (blocking group size, blocking group members, house placement, whether students blocked with suitemates)."),
+                          p("We collected 583 (35.6% of the 1637 first-years) responses through the survey. Respondents provided us with the names of their blocking group members, so we were able to match 1180 students (72.1%) to their blocking groups. Additionally, we scraped information from athletic roasters so we were able to collect information on everyone at the college. Although we planned to collect responses in first-year common spaces such as the dining hall, we were unable to do so following campus evacuation (due to COVID-19). While this reduced the total number of responses we could collect, we still had a large enough (and representative) dataset to produce meaningful analysis."),
+                          p("We made sure there was no double counting in the list of 1180 students (there was potential for overlap between the 583 students that filled out the survey and the names of the blocking group members we pulled from each person's response). To do so, we matched every respondent and blocking group member to their result in the Harvard College Facebook. We then took out any duplicates once spelling was standardized. Due to the sensitive information collected in this survey like financial aid status and sexual orientation, we decided not to make the data publicly available."),
+                          titlePanel("Randomization Process"),
+                          p("To simulate the housing process, we [1] identified blocking groups, [2] selected blocking groups at random and assigned them to a house until the house was full (we referenced official house sizes to determine how many students to assign to the house), [3] repeated step 2 for each house. Once we completed the assignment process, we generated summary statistics for the house using the 9 individual variables and the group size. We repeated this process 500 times and created confidence intervals for each variable using the summary statistics for each house. We also generated summary statistics and confidence intervals for each neighborhood (the \"River\" as a whole was added as a single neighborhood even though it technically consists of three neighborhoods: River West, River Central, and River East. This made Quad-River comparisons more convenient)."),
+                          titlePanel("Goodness of Fit"),
+                          p("Once we generated the confidence intervals and sample means from the simulated housing process, we compared the results to the official housing results. We generated the same summary statistics for each house and neighborhood for both the random simulation and the official data. To determine whether Harvard's housing process was \"fair,\" we checked if the variable distributions from the official housing assignments were comparable to the results of the 500 random simulations we ran. For this comparison we used confidence intervals and a chi-squared test."),
+                          h4("Confidence Intervals"),
+                          p("As can be seen on the \"Comparisons\" tab, there are very few variables that fall outside of the 95% confidence intervals we generated. The following exceptions were noted:"),
+                          tags$ol(
+                            tags$li("International Students in Cabot: 2.6% of students in Cabot are international which is below the lower bound of the 95% confidence interval (2.94%)."),
+                            tags$li("Financial Aid in Eliot: 44.6% of students in Eliot are on financial aid which is below the the lower bound of the 95% confidence interval (47.2%)."),
+                            tags$li("Group Size in Adams: The average blocking group size in Adams is 6.86 students which is above the upper bound of the 95% confidence interval (6.78 students)."),
+                            tags$li("Group Size in Mather: The average blocking group size in Mather is 6.92 students which is above the upper bound of the 95% confidence interval (6.89 students)."),
+                            tags$li("Financial Aid in River West: 51.4% of students in River West are on financial aid which is below the lower bound of the 95% confidence interval (52.3%). This is largely due to the low proportion of students on financial aid in Eliot, but both other River West houses (Kirkland and Winthrop) have financial aid proportions below the median value generated from our random simulations (Kirkland has 56.4% of students on financial aid which is below the median value of 61.0% and Winthrop has 55.6% of students on financial aid which is below the median value of 61.5%).")
+                          ),
+                          h4("Chi-squared Test"),
+                          p("Besides generating confidence intervals and comparing the results to the raw data, we also conducted a chi-squared test for the houses and the neighborhoods. The chi-squared test checks for a goodness-of-fit to determine if there is a statistically significant difference between two distributions of categorical variables. The two distributions passed into the chi-squared test were 1. the median values for five summary statistics (international students, varsity students, legacy students, financial aid, blocking group size) produced by our random simulation, and 2. the official values for these variables based on the college's official housing process. A p-value below 0.05 suggests that there is a statistically significant difference between the two distributions. Therefore for our purposes, if the p-value is below 0.05, then there is a statistically significant difference between our random simulation and the official housing process. If the p-value is above 0.05, there is no statistically-significant difference between the two distributions and we cannot reject the null hypothesis. In other words, if p < 0.05, there is evidence of bias in the housing process, but if p > 0.05, then there is not enough evidence to say the process isn't random."),
+                          br(),
+                          fluidRow(
+                            column(3, offset = 2, gt_output("chisq_houses")),
+                            column(3, offset = 2, gt_output("chisq_neighborhoods"))
+                          ),
+                          br(),
+                          p("Each of the five variables have p-values far above 0.05 for analysis on the house and neighborhood level. This suggests that there is not enough evidence to reject the null hypothesis and we cannot conclude that Harvard's housing is not random. This is consistent with previous findings on Harvard's housing process. Paired with the very few observations that fall outside of our confidence intervals, it appears that Harvard continues to run a relatively random process."),
+                          
+                          titlePanel("Areas of Improvement"),
+                          h4("Data Collection"),
+                          p("We were able to collect data for 72.1% of the class but we still missed 27.9% of the data. Due to campus evacuation, we were unable to collect data in person at the College. An opportunity to publicize the survey in first-year common spaces would have increased the available information for analysis."),
+                          h4("Randomization"),
+                          p("Every randomization process has its own biases. A good randomization process minimizes these biases. For our randomization process, there were a number of tradeoffs we made. The most important tradeoff was between uniform variable distributions versus adjusted distributions based on house size. If we assigned the same number of students to each house, we would have been more likely to get a uniform distribution for the variables in each house. We did not believe this simulated the actual limitations of the housing process and so we sacrificed a more uniform distribution for what we believe more accurately represents the housing process."),
+                          h4("Fairness"),
+                          p("We chose to use confidence intervals and a chi-squared test to determine whether or not Harvard's housing process is \"fair.\" A different definition or methodology could have easily produced a different conclusion. While we considered using a numeric approach to determine \"fairness\" (a sum of residuals between the observed variable distribution and the expected variable distribution from the random simulation), we decided against this strategy because unlike the chi-squared test, there was no objective benchmark that would indicate an unfair housing process."),
+                          br()
+                          ),
+                
+                
+                 tabPanel("About",
+                   fluidRow(
+                     column(12,
+                            titlePanel("Project Background and Motivations")
+                     )
+                   ),
+                   fluidRow(
+                     column(12,
+                            h4("Housing Day at Harvard College is one of the most thrilling and dramatic days of the school year, and we wanted to use data as a tool for tackling some of the myths and stereotypes about housing day. This project aims to continue a tradition of looking at Harvard's housing process to determine whether the process is fair. We built off of last year's work by producing more rigorous data analysis and statistical computation, more intuitive graph design, and additional questions (including sexual orientation).")
+                     )
+                   ),
+                   fluidRow(
+                     column(3,
+                            titlePanel("About Us")
+                     )
+                   ),
+                   
+                   # Images and Bios below.
+                   
+                   
+                   fluidRow(
+                     column(3, imageOutput("Jamal")),
+                     column(4, offset = 1, h1("Jamal Nimer"), br(), h3("Hi, I’m Jamal, a member of the class of 2023 from Chicago, IL! I'm interested in data science and its applications to international development. Besides R, I enjoy biking and playing card games. Feel free to get in touch at jamalnimer@college.harvard.edu")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Lucy")),
+                     column(4, offset = 1, h1("Lucy He"), br(), h3("Hi! I’m Lucy He, a current freshman at Harvard College thinking about concentrating in computer science & math. Besides data science, I’m also a big fan of musical theater, urban planning, and more ;) You can reach me at luxihe@college.harvard.edu")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Eliot")),
+                     column(4, offset = 1, h1("Eliot Min"), br(), h3("Hello! My name is Eliot and I’m a member of the class of 2023. I hope to use my data analysis skills to investigate speculative claims and unsubstantiated theories, as we did with Harvard College’s housing day. Outside of data science, I’m an a cappella junkie, diehard New York Mets fan, and sushi addict.")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Austin")),
+                     column(4, offset = 1, h1("Austin Li"), br(), h3("My name is Austin Li, and I am planning on studying Physics/Math with a secondary in Computer Science. I’m interested in Asian American civic engagement and outside of class, I enjoy writing for The Crimson, playing volleyball, and playing board games! Feel free to contact me at awli@college.harvard.edu")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Shojeh")),
+                     column(4, offset = 1, h1("Shojeh Liu"), br(), h3("Hi, I’m Shojeh, a member of the class of 2023! I hope to use my data analysis skills in the future to study how humans work together. My favorite things are Settlers of Catan, Sushi, and the web serial Worm!")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Ilyas")),
+                     column(4, offset = 1, h1("Ilyas Mardin"), br(), h3("Hi I’m Ilyas, a member of the class of 2023! I hope to use my interest in data science to more effectively implement medicines and antibiotics in the future. Some of my favourite things are Lauv, tennis, and exploring new places to eat! Feel free to get in touch with me at ilyasmardin@college.harvard.edu.")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Carina")),
+                     column(4, offset = 1, h1("Carina Peng"), br(), h3("Hello! I’m Carina, a rising sophomore from the best city Chicago and living in the best house Dunster. I hope to use data science in the future on issues of international development and public health. I love traveling and snacking on roasted coconut chips.")),
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Sam")),
+                     column(4, offset = 1, h1("Sam Saba"), br(), h3("My name is Sam (Sam'aan) Saba, and I am a rising Palestinian-American sophomore from Detroit, MI intending to concentrate in Social Studies and Near Eastern Languages and Civilizations! I'm involved with the Arab organizations on campus, and love exploring languages!"))
+                   ),
+                   br(),
+                   fluidRow(
+                     column(3, imageOutput("Angie")),
+                     column(4, offset = 1, h1("Angie Shin"), br(), h3("Hey, my name is Angie and I’m a first-year at the College! I like data analytics because it lets me study how people interact with each other in different environments. You can always find me grumbling about how cereal is indeed a soup or why Christmas songs should be played all year long!")),
+                   ),
+                   br(),
+                   br()
+                   ))
 
 
 server <- function(input, output) {
@@ -302,12 +418,16 @@ server <- function(input, output) {
       our_graph <- create_pie(our_international, "Our Data")
       crim_graph <- create_pie(crim_international, "Crimson Data")
     } else if (type == 2) {
-      our_graph <- create_pie(our_athlete, "Our Data")
+      our_graph <- create_pie(our_athlete, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_athletes, "Crimson Data") +
         labs(caption = "Crimson Athlete data only includes recruited student athletes.* 
 This likely causes the discrepancy seen here.")     
     } else if (type == 3) {
-      our_graph <- create_pie(our_legacy, "Our Data")
+      our_graph <- create_pie(our_legacy, "Our Data") +
+        labs(caption = "  
+ ")
       crim_graph <- create_pie(crim_legacy, "CrimsonData") +
         labs(caption = "Crimson Legacy data includes all relatives, including siblings.* 
 This likely causes the discrepancy seen here.")
@@ -333,7 +453,7 @@ This likely causes the discrepancy seen here.")
       input$variable == "prop_international" ~ c(.05, .25),
       input$variable == "prop_varsity" ~ c(.10, .25),
       input$variable == "prop_legacy" ~ c(.1, .25),
-      input$variable == "prop_financial_aid" ~ c(.5, .8),
+      input$variable == "prop_financial_aid" ~ c(.4, .8),
       input$variable == "prop_group_size" ~ c(5, 7)
     )
     
@@ -392,9 +512,13 @@ This likely causes the discrepancy seen here.")
         input$neighborhood_1 == "river_central" ~ "River Central")
       ),
       x = xlabel,
-      y = "Replicates",
+      y = "Simulations",
       subtitle = "Red bars represent confidence intervals") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.subtitle = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable != "prop_group_size"){
       graph1 <- graph1 + scale_x_continuous(limits = xscale, labels = scales::percent)
@@ -420,9 +544,13 @@ This likely causes the discrepancy seen here.")
         input$neighborhood_2 == "river_central" ~ "River Central")
       ),
       x = xlabel,
-      y = "Replicates",
+      y = "Simulations",
       subtitle = "Red bars represent confidence intervals") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(plot.subtitle = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable != "prop_group_size"){
       graph2 <- graph2 + scale_x_continuous(limits = xscale, labels = scales::percent)
@@ -448,7 +576,7 @@ This likely causes the discrepancy seen here.")
       input$variable2 == "prop_group_size" ~ "Average Blocking Group Size"
     )
     
-    ylabel <- "Replicates"
+    ylabel <- "Simulations"
     
     xscale <- case_when(
       input$variable2 == "prop_international" ~ c(0, .3),
@@ -481,7 +609,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = pfoho_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_pfoho, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     currier_conf.int <- confidence_interval_pivoted("currier") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -501,7 +632,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = currier_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_currier, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     cabot_conf.int <- confidence_interval_pivoted("cabot") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -521,7 +655,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = cabot_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_cabot, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     mather_conf.int <- confidence_interval_pivoted("mather") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -541,7 +678,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = mather_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_mather, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     leverett_conf.int <- confidence_interval_pivoted("leverett") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -561,7 +701,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = leverett_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_leverett, input$variable2), 
                  color = "#00BFC4") +
-        theme_classic()
+        theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
       
     dunster_conf.int <- confidence_interval_pivoted("dunster") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -581,7 +724,10 @@ This likely causes the discrepancy seen here.")
      geom_vline(xintercept = dunster_conf.int[2], color = "#F8766D") +
      geom_vline(xintercept = pull_desired(base_dunster, input$variable2), 
                 color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+     theme(plot.title = element_text(hjust = 0.5)) +
+     theme(text = element_text(family = "Avenir")) +
+     theme(title = element_text(family = "Avenir")) 
     
     eliot_conf.int <- confidence_interval_pivoted("eliot") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -601,7 +747,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = eliot_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_eliot, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     kirkland_conf.int <- confidence_interval_pivoted("kirkland") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -621,7 +770,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = kirkland_conf.int[2], color = "#F8766D") + 
       geom_vline(xintercept = pull_desired(base_kirkland, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
 
     winthrop_conf.int <- confidence_interval_pivoted("winthrop") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -641,7 +793,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = winthrop_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_winthrop, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
 
     adams_conf.int <- confidence_interval_pivoted("adams") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -661,7 +816,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = adams_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_adams, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     lowell_conf.int <- confidence_interval_pivoted("lowell") %>%
       filter(percentile %in% c(.025, .975)) %>%
@@ -681,7 +839,10 @@ This likely causes the discrepancy seen here.")
       labs(x = xlabel, 
            y = ylabel,
            title = "Lowell") + 
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     
     quincy_conf.int <- confidence_interval_pivoted("quincy") %>%
@@ -703,7 +864,10 @@ This likely causes the discrepancy seen here.")
       geom_vline(xintercept = quincy_conf.int[2], color = "#F8766D") +
       geom_vline(xintercept = pull_desired(base_quincy, input$variable2), 
                  color = "#00BFC4") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     if(input$variable2 != "prop_group_size"){
       
@@ -744,28 +908,33 @@ This likely causes the discrepancy seen here.")
     
   })
   
-  
   output$segregationGraphs <- renderPlot({
     
     asians <- ggplot(ethnicities %>% filter(prop_asian > 0) %>% count(prop_asian), aes(x = prop_asian, y = n/46)) +
-      geom_col(width = .05) +
+      geom_col(width = .05, fill = "#00BFC4") +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of Asian students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing Asian students",
            subtitle = "46 blocking groups contained at least one Asian student") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     whites <- ggplot(ethnicities%>%filter(prop_white > 0) %>% count(prop_white), aes(x = prop_white, y = n/57)) +
-      geom_col(width = .05) +
+      geom_col(width = .05, fill = "#00BFC4") +
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .23), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .25), labels = scales::percent) +
       labs(x = "Percentage of White students within blocking group", 
            y = "Percentage of Blocking Groups",
            title = "Composition of Blocking Groups containing White students",
            subtitle = "57 blocking groups contained at least one White student") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(asians, whites)
     
@@ -775,24 +944,30 @@ This likely causes the discrepancy seen here.")
   output$genderGraphs <- renderPlot({
     
     females <- ggplot(gender %>% filter(prop_female > 0) %>% count(prop_female), aes(x=prop_female, y = n/55)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
       labs(x = "Percentage of female students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing female students",
            subtitle = "55 blocking groups contained at least one female student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     males <- ggplot(gender %>% filter(prop_male > 0) %>% count(prop_male), aes(x=prop_male, y = n/49)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
       scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
       labs(x = "Percentage of male students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing male students",
            subtitle = "49 blocking groups contained at least one male student") +
-      theme_classic() 
+      theme_classic()  + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(females, males)
                     
@@ -801,26 +976,83 @@ This likely causes the discrepancy seen here.")
   output$sexualOrientationGraphs <- renderPlot({
     
     heterosexuals <- ggplot(orientations %>% filter(prop_heterosexual > 0) %>% count(prop_heterosexual), aes(x=prop_heterosexual, y = n/70)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of heterosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing heterosexual students",
            subtitle = "70 blocking groups contained at least one heterosexual student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     homosexuals <- ggplot(orientations %>% filter(prop_homosexual > 0) %>% count(prop_homosexual), aes(x=prop_homosexual, y = n/20)) + 
-      geom_col(width = .05) + 
+      geom_col(width = .05, fill = "#00BFC4") + 
       scale_x_continuous(limits = c(.1, 1.1), breaks = c(.1, .2, .3, .4, .5, .6, .7, .8, .9, 1), labels = scales::percent) +
-      scale_y_continuous(limits = c(0, .5), labels = scales::percent) +
+      scale_y_continuous(limits = c(0, .6), labels = scales::percent) +
       labs(x = "Percentage of homosexual students within blocking group", 
            y = "Percentage of blocking groups",
            title = "Composition of blocking groups containing homosexual students",
            subtitle = "20 blocking groups contained at least one homosexual student") +
-      theme_classic() 
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
     plot_grid(homosexuals, heterosexuals)
+    
+  })
+  
+  output$relative_house <- renderPlot({
+    
+    # selects legacy students who reported their relative's house
+    
+    legacy <- official_housing %>% 
+      filter(!is.na(relative_house)) %>% 
+      mutate(same_house = ifelse(house == relative_house, TRUE, FALSE)) %>% 
+      select(same_house)
+    
+    # number of legacy students who reported their relative's house
+    
+    total <- legacy %>% 
+      count()
+    
+    # number of legacy students who reported their relative's house and got the same house
+    
+    same_house <- legacy %>% 
+      filter(same_house) %>% 
+      count()
+    
+    # proportion of legacy students who reported their relative's house and got the same house; observed and expected
+    
+    percent_same_observed <- round(as.numeric(same_house / total)*100, digits = 1)
+    
+    percent_same_expected <- round(as.numeric(1/12)*100, digits = 1)
+    
+    # tibble with the proportion of students who got the same house and different house
+    
+    observed_distribution <- data.frame(
+      Type = c("Same House", "Different House"),
+      Percentage = c(percent_same_observed, 100 - percent_same_observed)
+    )
+    
+    # the same tibble but for the expected distribution which is 1/12
+    
+    expected_distribution <- data.frame(
+      Type = c("Same House", "Different House"),
+      Percentage = c(percent_same_expected, 100 - percent_same_expected)
+    )
+
+    # creates pie graphs for the expected and observed distributions for legacy
+    
+    expectation <- create_pie(observed_distribution, "Observed Legacy Placement")
+
+    observed <- create_pie(expected_distribution, "Expected Legacy Placement")
+
+    plot_grid(expectation, observed)
+
     
   })
   
@@ -828,38 +1060,19 @@ This likely causes the discrepancy seen here.")
     
     
     suitemate_size_relationship %>%
-      ggplot(aes(x = size, y = perc_blockwithsuite))+geom_point() +
-      geom_smooth(method = "lm", se = F) + 
+      ggplot(aes(x = size, y = perc_blockwithsuite))+
+      geom_point(color = "#F8766D") +
+      geom_smooth(method = "lm", se = F, color = "#00BFC4") + 
       labs(x = "Size of Freshman Dorm",
            y = "Percentage of blocking groups containing 2+ suitemates from dorm",
            title = "Size of Freshman Dorm against Rooming with Suitemates") +
       scale_y_continuous(labels = scales::percent) +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
   })
   
-  output$linkVsGroupSize <- renderPlot({
-    
-    
-    links_n_sizes <- official_housing %>% 
-      select(group_name, linking) %>% 
-      mutate(is_linking = 
-               ifelse(!is.na(linking), 1, 0)) %>% 
-      group_by(group_name, is_linking) %>% 
-      summarize(group_size = n()) %>% 
-      ungroup() %>% filter(group_size < 9)
-    
-    ggplot(links_n_sizes, aes(x = is_linking, y = group_size)) + 
-      geom_jitter() + 
-      geom_smooth(method = "lm", se = FALSE) +
-      scale_y_continuous(limits = c(0, 8)) +
-      scale_x_continuous(limits = c(0, 1), breaks = c(0,1), labels = c("not linked", "linked")) + 
-      labs(x = "Presence of a Linking Group",
-           y = "Blocking Group Size",
-           title = "Blocking Group Size vs Presence of a Linking Group") +
-      theme_classic()
-    
-    
-  })
   output$whereDoTheyGo <- renderPlot({
     
     totals <- official_housing %>%
@@ -875,14 +1088,18 @@ This likely causes the discrepancy seen here.")
              pctriver = ifelse(quad == "River", pct, 0))
       
     
-    ggplot(combined, aes(x = fct_reorder(dorm, (pctriver)), y = pct, color = quad)) + 
+    ggplot(combined, aes(x = fct_reorder(dorm, (pctriver)), y = pct, fill = quad)) + 
     geom_bar(stat = "identity") +
       scale_y_continuous(labels = scales::percent) +
       coord_flip() +
       labs(title = "House Placements by Freshman Dorm",
            x = "Freshman Dorm", 
-           y = "Percentage of Students") +
-      theme_classic()
+           y = "Percentage of Students",
+           fill = "Neighborhood") +
+      theme_classic() +  
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
     
   })
 
@@ -890,14 +1107,102 @@ This likely causes the discrepancy seen here.")
   output$varsityPerBlock <- renderPlot({
     
     ggplot(varsity_per_block, aes(x = fct_reorder(house, (average_varsity)), y = average_varsity)) +
-      geom_col() + 
+      geom_col(fill = "#00BFC4") + 
       labs(x = "House Placement",
            y = "Average Varsity athletes per blocking group",
            title = "Varsity Athletes per Blocking Group") +
-      theme_classic()
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) 
   })
   
+  output$approvalRate <- renderPlot({
+    
+    # creates a tibble with the average approval rate for each house.
+    
+    house_approval <- official_housing %>% 
+      group_by(house) %>% 
+      select(house, approval) %>% 
+      summarize(mean = mean(approval, na.rm = TRUE))
+    
+    # creates a plot of the tibble above and reorders the x-axis.
+    
+    ggplot(house_approval, aes(x = reorder(house, mean), mean)) +
+      geom_col(fill = "#00BFC4") + 
+      labs(x = "House Placement",
+           y = "Approval Rating (%)",
+           title = "Percent Approval Rating by House") +
+      theme_classic() + 
+      theme(plot.title = element_text(hjust = 0.5)) +
+      theme(text = element_text(family = "Avenir")) +
+      theme(title = element_text(family = "Avenir")) +
+      scale_y_continuous(labels = c("0%","25%","50%","75%","100%"))
+      
+  })
   
+  output$chisq_houses <- render_gt({
+    chisq_houses 
+    
+  })
+  
+  output$chisq_neighborhoods <- render_gt({
+    chisq_neighborhoods
+  })
+  
+  output$Jamal <- renderImage({list(src = './www/Jamal.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Austin <- renderImage({list(src = './www/Austin.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Carina <- renderImage({list(src = './www/Carina.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Shojeh <- renderImage({list(src = './www/Shojeh.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Lucy <- renderImage({list(src = './www/Lucy.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Sam <- renderImage({list(src = './www/Sam.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Angie <- renderImage({list(src = './www/Angie.JPG',
+                                   width = 300,
+                                   height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Ilyas <- renderImage({list(src = './www/Ilyas.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
+  
+  output$Eliot <- renderImage({list(src = './www/Eliot.JPG',
+                                    width = 300,
+                                    height = 400)
+    
+  }, deleteFile = FALSE)
 }
 #   
 # animate(plot, renderer = ffmpeg_renderer())

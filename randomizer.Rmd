@@ -117,7 +117,10 @@ simplified <- all_communities %>% select(-data, -assigned) %>%
 
 ```{r saveRDS}
 
-saveRDS(object = full_data_pivoted, file = "shiny_app/full_data_pivoted.RDS")
+# do not uncomment unless significant changes have been made or it will
+# over ride the 500 reps that Eliot's computer gave its life to.
+
+# saveRDS(object = full_data_pivoted, file = "shiny_app/full_data_pivoted.RDS")
 # saveRDS(object = other, file = "shiny_app/other.RDS")
 
 # saveRDS(object = assigned_all, file = "shiny_app/updated_fake_data.RDS")

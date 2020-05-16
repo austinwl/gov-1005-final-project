@@ -1,0 +1,265 @@
+---
+title: "chi_squared"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(broom)
+library(gt)
+```
+
+
+```{r load_data}
+
+# reads in the high rep data from shiny
+
+random_longer <- readRDS("shiny_app/simplified.RDS") 
+
+
+# I didn't want to change the name of the object read into the ShinyApp
+# so I just redid the calculation here
+
+real <- official_housing %>% 
+  
+  # 1) take the sheet of freshman and nest
+  nest(data=everything()) %>% 
+  
+  # 2) take each tibble of "assigned" freshmen and generate community summaries
+  
+  # neighborhoods
+  mutate(river_central = map(data, ~overview(assigned = ., community = 'river_central'))) %>% 
+  mutate(river_east = map(data, ~overview(assigned = ., community = 'river_east'))) %>% 
+  mutate(river_west = map(data, ~overview(assigned = ., community = 'river_west'))) %>% 
+  mutate(river = map(data, ~overview(assigned = ., community = 'river'))) %>% 
+  mutate(quad = map(data, ~overview(assigned = ., community = 'quad'))) %>% 
+  
+  #river_central
+  mutate(adams = map(data, ~overview(assigned = ., community = 'Adams'))) %>% 
+  mutate(lowell = map(data, ~overview(assigned = ., community = 'Lowell'))) %>% 
+  mutate(quincy = map(data, ~overview(assigned = ., community = 'Quincy'))) %>% 
+  
+  
+  # river_east
+  mutate(leverett = map(data, ~overview(assigned = ., community = 'Leverett'))) %>% 
+  mutate(dunster = map(data, ~overview(assigned = ., community = 'Dunster'))) %>% 
+  mutate(mather = map(data, ~overview(assigned = ., community = 'Mather'))) %>%  
+  
+  
+  # river_west
+  mutate(winthrop = map(data, ~overview(assigned = ., community = 'Winthrop'))) %>% 
+  mutate(kirkland = map(data, ~overview(assigned = ., community = 'Kirkland'))) %>% 
+  mutate(eliot = map(data, ~overview(assigned = ., community = 'Eliot'))) %>%   
+  
+  
+  # quad
+  mutate(currier = map(data, ~overview(assigned = ., community = 'Currier'))) %>% 
+  mutate(pforzheimer = map(data, ~overview(assigned = ., community = 'Pforzheimer'))) %>% 
+  mutate(cabot = map(data, ~overview(assigned = ., community = 'Cabot'))) 
+
+```
+
+
+```{r random_pivot}
+
+# modifies pfohos name to match in the join
+
+random_longer$community[which(random_longer$community == "pfoho")] <- "pforzheimer"
+
+# pivots the high rep data so that it can be aggregated more easily and ungroups
+# replicate
+
+cleaned_random <- random_longer %>%
+  ungroup(replicate) %>% 
+  select(-replicate) %>% 
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+aggregated <- aggregate(. ~ community, cleaned_random, mean)
+
+
+```
+
+```{r real_pivot}
+
+# does the same pivot and selection process for the real data
+
+real_pivoted <- real %>% 
+  pivot_longer(-data, 
+               names_to = "community", 
+               values_to = "demographics") %>% 
+  select(-data)
+
+
+official <- real_pivoted %>%
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+official
+```
+
+```{r join_data}
+
+
+# two datasets to compare: aggregated (randomized) and official 
+
+aggregated <- aggregated %>% arrange(community)
+official <-  official %>% arrange(community)
+
+# joins the aggregated (randomized) and official data to put variables side
+# by side for comparison
+
+comparison <- left_join(aggregated, official, by = "community", suffix = c(".aggregated", ".official")) 
+
+community_sizes <- tibble(
+  communities = c(
+    adams = 132,
+    cabot = 126,
+    currier = 126,
+    dunster = 129,
+    eliot = 148,
+    kirkland = 130,
+    leverett = 156,
+    lowell = 150,
+    mather = 124,
+    pforzheimer = 152,
+    quad = 404,
+    quincy = 147,
+    river = 1233,
+    river_central = 429,
+    river_east = 409,
+    river_west = 395,
+    winthrop = 117
+  )
+)
+
+# changes proportions to frequencies to compare with chi squared
+#order is not correct for neighborhoods versus houses
+
+
+for (i in 2:11){
+  comparison[i] <- round(comparison[i]*community_sizes, 0)
+}
+
+aggregated
+official
+comparison
+
+```
+
+
+
+```{r split_house_and_neighborhood}
+
+# create house and neighborhood subsets for comparison
+
+comparison_houses <- comparison %>% 
+  filter(community %in% c("adams", "cabot", "currier",
+                          "dunster", "eliot", "kirkland",
+                          "leverett", "lowell", "mather",
+                          "pforzheimer", "quincy", "winthrop"))
+
+comparison_neighborhoods <- comparison %>% 
+  filter(community %in% c("quad", "river_east", "river_central", "river_west"))
+
+comparison_houses
+comparison_neighborhoods
+
+```
+
+
+```{r chisq_tests_houses}
+
+# compare houses 
+
+chisq_houses <- tibble(
+  variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
+  pvalue = c(
+    # prop_international
+    chisq.test(comparison_houses$prop_international.aggregated, comparison_houses$prop_international.official)%>% tidy() %>% pull(p.value),
+    
+    # prop_varsity
+    chisq.test(comparison_houses$prop_varsity.aggregated, comparison_houses$prop_varsity.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_legacy
+    chisq.test(comparison_houses$prop_legacy.aggregated, comparison_houses$prop_legacy.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_financial_aid
+    chisq.test(comparison_houses$prop_financial_aid.aggregated, comparison_houses$prop_financial_aid.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_group_size
+    chisq.test(comparison_houses$prop_group_size.aggregated, comparison_houses$prop_group_size.official) %>% tidy() %>% pull(p.value)
+  )
+) %>% 
+  gt() %>% 
+  tab_header(
+    title = "Chi-squared test ",
+    subtitle = "Comparison between the twelve Harvard houses"
+  ) %>% 
+  cols_label(
+    variable = "Variable",
+    pvalue = "P-Value"
+  ) 
+
+chisq_houses
+```
+
+
+```{r chisq_tests_neighborhoods}
+# compare neighborhoods 
+
+chisq_neighborhoods <- tibble(
+  variable = c("International", "Varsity", "Legacy", "Financial Aid", "Group Size"),
+  pvalue = c(
+    # prop_international
+    chisq.test(comparison_neighborhoods$prop_international.aggregated, comparison_neighborhoods$prop_international.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_varsity
+    chisq.test(comparison_neighborhoods$prop_varsity.aggregated, comparison_neighborhoods$prop_varsity.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_legacy
+    chisq.test(comparison_neighborhoods$prop_legacy.aggregated, comparison_neighborhoods$prop_legacy.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_financial_aid
+    chisq.test(comparison_neighborhoods$prop_financial_aid.aggregated, comparison_neighborhoods$prop_financial_aid.official) %>% tidy() %>% pull(p.value),
+    
+    # prop_group_size
+    chisq.test(comparison_neighborhoods$prop_group_size.aggregated, comparison_neighborhoods$prop_group_size.official) %>% tidy() %>% pull(p.value)
+  )
+) %>% 
+  gt() %>% 
+  tab_header(
+    title = "Chi-squared test ",
+    subtitle = "Comparison between the four Harvard neighborhoods"
+  ) %>% 
+  cols_label(
+    variable = "Variable",
+    pvalue = "P-Value"
+  )
+
+
+chisq_neighborhoods
+    
+```
+
+
+```{r}
+saveRDS(object = chisq_houses, file = "shiny_app/chisq_houses.RDS")
+saveRDS(object = chisq_neighborhoods, file = "shiny_app/chisq_neighborhoods.RDS")
+```
+
+
+
+# Results and Concerns:
+Is the Chi-squared test appropriate?
+- Consider doing it manually without the square. Absolute value difference. What number of houses are more than 4% off (epsilon-delta?)
+- The sampling method is simple random sampling (Not true? Collected 600 responses over email; also variables are related to one another (financial aid can be related to ethnicity))
+- The variables under study are each categorical (Observations report counts for each categorical variable)
+- If sample data are displayed in a contingency table, the expected frequency count for each cell of the table is at least 5 (Yes; enough data)
+
+Interpretation of Chi-squared:
+- The p-values are all very high (> 0.20) --> we accept the null hypothesis (we can't reject the null hypothesis) that the data are similar.
+
+
+modify aggregate to multiply by house size not class
+

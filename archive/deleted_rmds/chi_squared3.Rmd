@@ -1,0 +1,270 @@
+---
+title: "chi_squared"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(broom)
+library(gt)
+```
+
+
+```{r load_data}
+
+# reads in the high rep data from shiny
+
+random_longer <- readRDS("shiny_app/simplified.RDS") 
+
+
+# I didn't want to change the name of the object read into the ShinyApp
+# so I just redid the calculation here
+
+real <- official_housing %>% 
+  
+  # 1) take the sheet of freshman and nest
+  nest(data=everything()) %>% 
+  
+  # 2) take each tibble of "assigned" freshmen and generate community summaries
+  
+  # neighborhoods
+  mutate(river_central = map(data, ~overview(assigned = ., community = 'river_central'))) %>% 
+  mutate(river_east = map(data, ~overview(assigned = ., community = 'river_east'))) %>% 
+  mutate(river_west = map(data, ~overview(assigned = ., community = 'river_west'))) %>% 
+  mutate(river = map(data, ~overview(assigned = ., community = 'river'))) %>% 
+  mutate(quad = map(data, ~overview(assigned = ., community = 'quad'))) %>% 
+  
+  #river_central
+  mutate(adams = map(data, ~overview(assigned = ., community = 'Adams'))) %>% 
+  mutate(lowell = map(data, ~overview(assigned = ., community = 'Lowell'))) %>% 
+  mutate(quincy = map(data, ~overview(assigned = ., community = 'Quincy'))) %>% 
+  
+  
+  # river_east
+  mutate(leverett = map(data, ~overview(assigned = ., community = 'Leverett'))) %>% 
+  mutate(dunster = map(data, ~overview(assigned = ., community = 'Dunster'))) %>% 
+  mutate(mather = map(data, ~overview(assigned = ., community = 'Mather'))) %>%  
+  
+  
+  # river_west
+  mutate(winthrop = map(data, ~overview(assigned = ., community = 'Winthrop'))) %>% 
+  mutate(kirkland = map(data, ~overview(assigned = ., community = 'Kirkland'))) %>% 
+  mutate(eliot = map(data, ~overview(assigned = ., community = 'Eliot'))) %>%   
+  
+  
+  # quad
+  mutate(currier = map(data, ~overview(assigned = ., community = 'Currier'))) %>% 
+  mutate(pforzheimer = map(data, ~overview(assigned = ., community = 'Pforzheimer'))) %>% 
+  mutate(cabot = map(data, ~overview(assigned = ., community = 'Cabot'))) 
+
+```
+
+
+```{r random_pivot}
+
+# modifies pfohos name to match in the join
+
+random_longer$community[which(random_longer$community == "pfoho")] <- "pforzheimer"
+
+# pivots the high rep data so that it can be aggregated more easily and ungroups
+# replicate
+
+cleaned_random <- random_longer %>%
+  ungroup(replicate) %>% 
+  select(-replicate) %>% 
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+aggregated <- aggregate(. ~ community, cleaned_random, mean)
+
+
+```
+
+```{r real_pivot}
+
+# does the same pivot and selection process for the real data
+
+real_pivoted <- real %>% 
+  pivot_longer(-data, 
+               names_to = "community", 
+               values_to = "demographics") %>% 
+  select(-data)
+
+
+official <- real_pivoted %>%
+  unnest(demographics) %>% 
+  select(1:5,8)
+
+official
+```
+
+```{r join_data}
+
+# two datasets to compare: aggregated (randomized) and official 
+
+aggregated <- aggregated %>% arrange(community)
+official <-  official %>% arrange(community)
+
+# joins the aggregated (randomized) and official data to put variables side
+# by side for comparison
+
+comparison <- left_join(aggregated, official, by = "community", suffix = c(".aggregated", ".official")) 
+community_sizes <- tibble(
+  communities = c(
+    adams = 132,
+    cabot = 126,
+    currier = 126,
+    dunster = 129,
+    eliot = 148,
+    kirkland = 130,
+    leverett = 156,
+    lowell = 150,
+    mather = 124,
+    pforzheimer = 152,
+    quad = 404,
+    quincy = 147,
+    river = 1233,
+    river_central = 429,
+    river_east = 409,
+    river_west = 395,
+    winthrop = 117
+  )
+)
+
+# changes proportions to frequencies to compare with chi squared
+#order is not correct for neighborhoods versus houses
+
+
+for (i in 2:11){
+  comparison[i] <- round(comparison[i]*community_sizes, 0)
+}
+
+aggregated
+official
+comparison
+
+```
+
+
+
+```{r split_house_and_neighborhood}
+
+# create house and neighborhood subsets for comparison
+
+comparison_houses <- comparison %>% 
+  filter(community %in% c("adams", "cabot", "currier",
+                          "dunster", "eliot", "kirkland",
+                          "leverett", "lowell", "mather",
+                          "pforzheimer", "quincy", "winthrop"))
+
+comparison_neighborhoods <- comparison %>% 
+  filter(community %in% c("quad", "river_east", "river_central", "river_west"))
+
+comparison_houses
+comparison_neighborhoods
+
+```
+
+```{r manual_method_houses}
+
+# average of (observed - expected)/expected
+
+prop_difference <- tibble(
+  prop_international = 0,
+  prop_varsity = 0,
+  prop_legacy = 0,
+  prop_financial_aid = 0,
+  prop_group_size = 0
+)
+
+for (i in 1:5){
+  
+    # (observed (real) - expected (random)) / expected (random) for variable i
+  
+  residual <- abs((comparison_houses[i+6] - comparison_houses[i+1])/comparison_houses[i+1])
+  
+  
+  # take the average residual across all 12 houses for variable i
+  
+  avg_residual <- sum(residual)/12 
+  
+  
+  # assigns the average residual to prop_difference for variable i
+  
+  prop_difference[i] = avg_residual
+
+  # repeats the process for all 5 variables
+  
+  
+}
+
+# Prop_difference represents the proportion difference between each
+# variable. Now I take the average for all variables. I use the average
+# to get a percent difference that keeps the data consistent in terms of units.
+
+prop_difference
+
+
+# avg(|obs - expected| / expected)
+# = sum(|obs - expected| / expected)/num_variables
+```
+
+```{r manual_method_neighborhoods}
+
+# average of (observed - expected)/expected
+
+prop_difference <- tibble(
+  prop_international = 0,
+  prop_varsity = 0,
+  prop_legacy = 0,
+  prop_financial_aid = 0,
+  prop_group_size = 0
+)
+
+for (i in 1:5){
+  
+  # (observed (real) - expected (random)) / expected (random) for variable i
+  
+  residual <- abs((comparison_neighborhoods[i+6] - comparison_neighborhoods[i+1])/comparison_neighborhoods[i+1])
+  
+  
+  # take the average residual across all 12 houses for variable i
+  
+  avg_residual <- sum(residual)/4
+  
+  
+  # assigns the average residual to prop_difference for variable i
+  
+  prop_difference[i] = avg_residual
+
+  # repeats the process for all 5 variables
+  
+}
+
+# Prop_difference represents the proportion difference between each
+# variable. Now I take the sum of all the variables.  
+
+prop_difference
+
+# avg(|obs - expected| / expected)
+# = sum(|obs - expected| / expected)/num_variables
+```
+
+
+
+
+
+# Results and Concerns:
+Is the Chi-squared test appropriate?
+- Consider doing it manually without the square. Absolute value difference. What number of houses are more than 4% off (epsilon-delta?)
+- The sampling method is simple random sampling (Not true? Collected 600 responses over email; also variables are related to one another (financial aid can be related to ethnicity))
+- The variables under study are each categorical (Observations report counts for each categorical variable)
+- If sample data are displayed in a contingency table, the expected frequency count for each cell of the table is at least 5 (Yes; enough data)
+
+Interpretation of Chi-squared:
+- The p-values are all very high (> 0.20) --> we accept the null hypothesis (we can't reject the null hypothesis) that the data are similar.
+
+
+modify aggregate to multiply by house size not class
+
